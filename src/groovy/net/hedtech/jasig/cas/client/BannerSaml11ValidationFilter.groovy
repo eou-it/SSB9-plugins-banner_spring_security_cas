@@ -19,13 +19,11 @@ import javax.servlet.FilterConfig
  * CAS client 3.2.1 onwards, SAML11ValidationFilter claims full SAML 1.1. compliance
  * where it mandates artifact and service parameter names not to be customised.
  * So, options were:-
- * 1. Take a copy of 3.1.8's Saml11ValidationFilter and introduced this as a validation
- * filter bean. This class is made for that. I validated that it works fine even with
- * the rest of 3.2.1 artefacts. But this is still patchy way.
- * 2. If CAS client 3.2.1 could mandate such a restriction with artifact and service
- * parameters, then there must be CAS server version that is compliant with it which
- * could be used by EIS-CAS deployment. Need to explore more on this option for a
- * cleaner solution.
+ * 1. Let the new cas client mandate the SAML 1.1 compliance using 'SAMLart' and 'TARGET'
+ * by passing in the init parameter as 'SAMLart'.
+ * 2. Take a copy of 3.1.8's Saml11ValidationFilter and introduced this as a validation
+ * filter bean. This class is made for that. To allow fall back mechanism if a old CAS
+ * server is being used which cannot support SAML 1.1 compliance.
  */
 class BannerSaml11ValidationFilter extends AbstractTicketValidationFilter {
     public BannerSaml11ValidationFilter() {

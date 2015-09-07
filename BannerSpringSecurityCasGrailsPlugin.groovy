@@ -52,7 +52,7 @@ class BannerSpringSecurityCasGrailsPlugin {
                 }
                 'init-param' {
                     'param-name'('artifactParameterName')
-                    'param-value'('ticket')
+                    'param-value'(conf.cas.artifactParameter)
                 }
                 'init-param' {
                     'param-name'('tolerance')
