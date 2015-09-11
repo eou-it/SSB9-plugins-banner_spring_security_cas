@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.29'
         // runtime 'org.postgresql:postgresql:9.3-1101-jdbc41'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
-        provided ("org.opensaml:com.springsource.org.opensaml:1.1.0") {
+        compile ("org.opensaml:com.springsource.org.opensaml:1.1.0") {
             excludes "org.apache.xml:com.springsource.org.apache.xml.security:1.0.5.D2"
         }
         runtime "org.apache.santuario:xmlsec:1.4.3"
