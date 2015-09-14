@@ -8,6 +8,10 @@ import net.hedtech.banner.security.CasAuthenticationProvider
 import net.hedtech.jasig.cas.client.BannerSaml11ValidationFilter
 import org.jasig.cas.client.session.SingleSignOutHttpSessionListener
 import org.jasig.cas.client.util.HttpServletRequestWrapperFilter
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.security.web.util.matcher.RequestMatcher
+
+import javax.servlet.Filter
 
 class BannerSpringSecurityCasGrailsPlugin {
 
@@ -29,8 +33,6 @@ class BannerSpringSecurityCasGrailsPlugin {
         if (!conf || !conf.cas.active) {
             return
         }
-
-        println 'Configuring Spring Security CAS ...'
 
         // add the filter right after the last context-param
         def contextParam = xml.'context-param'
@@ -91,9 +93,13 @@ class BannerSpringSecurityCasGrailsPlugin {
         if (!conf || !conf.cas.active) {
             return
         }
+        println '\nConfiguring Banner Spring Security CAS ...'
+
         casBannerAuthenticationProvider(CasAuthenticationProvider) {
             dataSource = ref(dataSource)
         }
+
+        println '... finished configuring Banner Spring Security CAS\n'
     }
 
     def doWithApplicationContext = { applicationContext ->
@@ -109,6 +115,28 @@ class BannerSpringSecurityCasGrailsPlugin {
                 providerNames = ['casBannerAuthenticationProvider']
         }
         applicationContext.authenticationManager.providers = createBeanList(providerNames, applicationContext)
+
+        // Define the spring security filters
+        def authenticationProvider = Holders?.config?.banner.sso.authenticationProvider
+        LinkedHashMap<String, String> filterChain = new LinkedHashMap();
+        switch (authenticationProvider) {
+            case 'cas':
+                filterChain['/**/api/**'] = 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor'
+                filterChain['/**/qapi/**'] = 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor'
+                filterChain['/**'] = 'securityContextPersistenceFilter,logoutFilter,bannerMepCodeFilter,casAuthenticationFilter,authenticationProcessingFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor'
+                break
+            default:
+                break
+        }
+
+        LinkedHashMap<RequestMatcher, List<Filter>> filterChainMap = new LinkedHashMap()
+        filterChain.each { key, value ->
+            def filters = value.toString().split(',').collect {
+                name -> applicationContext.getBean(name)
+            }
+            filterChainMap[new AntPathRequestMatcher(key)] = filters
+        }
+        applicationContext.springSecurityFilterChain.filterChainMap = filterChainMap
     }
 
     private def isSsbEnabled() {
