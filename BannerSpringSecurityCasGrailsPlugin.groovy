@@ -20,7 +20,7 @@ class BannerSpringSecurityCasGrailsPlugin {
     // and will be removed when the maven-publisher plugin correctly sets the groupId based on the following field.
     String groupId = "net.hedtech"
 
-    String version = '2.11.0'
+    String version = '9.14'
     String grailsVersion = '2.5.0 > *'
 
     def dependsOn = [
