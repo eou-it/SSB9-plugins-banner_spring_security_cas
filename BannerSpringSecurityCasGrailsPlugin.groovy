@@ -116,7 +116,7 @@ class BannerSpringSecurityCasGrailsPlugin {
             providerNames.addAll conf.providerNames
         } else {
             if(ControllerUtils.isGuestAuthenticationEnabled()){
-                providerNames = ['casBannerAuthenticationProvider','selfServiceBannerAuthenticationProvider']
+                providerNames = ['casBannerAuthenticationProvider','selfServiceBannerAuthenticationProvider','bannerAuthenticationProvider']
             } else{
                 providerNames = ['casBannerAuthenticationProvider']
             }
