@@ -99,6 +99,9 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
         } catch (BadCredentialsException be)     {
             log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to BadCredentialsException: ${be.message}"
             throw be
+        }catch (UsernameNotFoundException ue)     {
+            log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to UsernameNotFoundException: ${ue.message}"
+            throw ue
         }
         catch (e) {
             // We don't expect an exception here, as failed authentication should be reported via the above exceptions
