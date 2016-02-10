@@ -4,6 +4,7 @@
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Holders
+import net.hedtech.banner.controllers.ControllerUtils
 import net.hedtech.banner.security.CasAuthenticationProvider
 import net.hedtech.jasig.cas.client.BannerSaml11ValidationFilter
 import org.jasig.cas.client.session.SingleSignOutHttpSessionListener
@@ -20,7 +21,7 @@ class BannerSpringSecurityCasGrailsPlugin {
     // and will be removed when the maven-publisher plugin correctly sets the groupId based on the following field.
     String groupId = "net.hedtech"
 
-    String version = '9.14'
+    String version = '9.14.1'
     String grailsVersion = '2.5.0 > *'
 
     def dependsOn = [
@@ -109,10 +110,16 @@ class BannerSpringSecurityCasGrailsPlugin {
             return
         }
         def providerNames = []
+
+
         if (conf.providerNames) {
             providerNames.addAll conf.providerNames
         } else {
+            if(ControllerUtils.isGuestAuthenticationEnabled()){
+                providerNames = ['casBannerAuthenticationProvider','selfServiceBannerAuthenticationProvider','bannerAuthenticationProvider']
+            } else{
                 providerNames = ['casBannerAuthenticationProvider']
+            }
         }
         applicationContext.authenticationManager.providers = createBeanList(providerNames, applicationContext)
 
