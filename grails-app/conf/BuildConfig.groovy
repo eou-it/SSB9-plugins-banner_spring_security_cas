@@ -43,7 +43,7 @@ grails.project.dependency.resolution = {
         compile 'joda-time:joda-time:2.2'
         compile 'org.opensaml:xmltooling:1.4.4'
         compile 'org.opensaml:opensaml:2.6.4'
-
+        compile 'xml-apis:xml-apis:1.4.01'
         compile ('org.jasig.cas.client:cas-client-core:3.3.3') {
             excludes 'commons-codec', 'commons-logging', 'junit', 'log4j', 'servlet-api',
                     'spring-beans', 'spring-context', 'spring-core', 'spring-test', 'xmlsec'
