@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.jasig.cas.client
 
@@ -7,16 +7,25 @@ import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.springframework.mock.web.MockFilterConfig
+import org.springframework.mock.web.MockServletContext
+
+import javax.servlet.FilterConfig
+import javax.servlet.ServletContext
 
 /**
- * Tests that the ValidPropertyConstraint is working as expected.
+ * Tests that the BannerSaml11ValidationFilterIntegrationTests is working as expected.
  */
 class BannerSaml11ValidationFilterIntegrationTests extends BaseIntegrationTestCase {
+
+    def bannerSaml11ValidationFilter
 
     @Before
     public void setUp() {
         formContext = ['GUAGMNU']
         super.setUp()
+
+        bannerSaml11ValidationFilter =  new BannerSaml11ValidationFilter()
     }
 
     @After
@@ -24,9 +33,11 @@ class BannerSaml11ValidationFilterIntegrationTests extends BaseIntegrationTestCa
         super.tearDown()
     }
 
-    //Below test will be removed when we add actual tests to get coverage
     @Test
-    void testDummyTes() {
-        assert 1==1
+    void testGetTicketValidator() {
+        ServletContext servletContext = new MockServletContext();
+        FilterConfig filterConfig = new MockFilterConfig(servletContext);
+        filterConfig.addInitParameter("casServerUrlPrefix", "https://localhost:8443/cas")
+        assertNotNull bannerSaml11ValidationFilter.getTicketValidator(filterConfig)
     }
 }
