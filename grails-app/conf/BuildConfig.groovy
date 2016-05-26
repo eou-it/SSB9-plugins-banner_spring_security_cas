@@ -40,14 +40,16 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
         // runtime 'mysql:mysql-connector-java:5.1.29'
         // runtime 'org.postgresql:postgresql:9.3-1101-jdbc41'
-        compile 'org.jasig.cas.client:cas-client-core:3.3.3', {
-            excludes 'commons-codec', 'commons-logging', 'junit', 'log4j', 'opensaml', 'servlet-api',
+        compile 'joda-time:joda-time:2.2'
+        compile 'org.opensaml:xmltooling:1.4.4'
+        compile 'org.opensaml:opensaml:2.6.4'
+        compile 'xml-apis:xml-apis:1.4.01'
+        compile ('org.jasig.cas.client:cas-client-core:3.3.3') {
+            excludes 'commons-codec', 'commons-logging', 'junit', 'log4j', 'servlet-api',
                     'spring-beans', 'spring-context', 'spring-core', 'spring-test', 'xmlsec'
         }
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
-        runtime ("org.opensaml:com.springsource.org.opensaml:1.1.0") {
-            excludes "org.apache.xml:com.springsource.org.apache.xml.security:1.0.5.D2"
-        }
+
         runtime "org.apache.santuario:xmlsec:1.4.3"
     }
 
