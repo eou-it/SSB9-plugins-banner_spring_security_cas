@@ -1,8 +1,9 @@
 /*******************************************************************************
- Copyright 2009-2014 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.security
 
+import grails.util.Holders
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.AuthorizationException
 import org.apache.log4j.Logger
@@ -12,7 +13,6 @@ import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 
 import org.springframework.context.ApplicationContext
-import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
@@ -20,6 +20,7 @@ import org.springframework.security.authentication.LockedException
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.RequestContextHolder as RCH
 
 
@@ -98,6 +99,7 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             throw ae
         } catch (BadCredentialsException be)     {
             log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to BadCredentialsException: ${be.message}"
+            makeGuralogEntryOnFailure()
             throw be
         }catch (UsernameNotFoundException ue)     {
             log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to UsernameNotFoundException: ${ue.message}"
@@ -112,4 +114,15 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
         }
     }
 
+    private void makeGuralogEntryOnFailure() {
+        def request = RequestContextHolder.currentRequestAttributes().request
+        def msg = request.session.getAttribute("msg")
+        def module = request.session.getAttribute("module")
+        def authName = request.session.getAttribute("auth_name")
+
+        Holders.getApplicationContext().publishEvent(new BannerAuthenticationEvent( authName, false, msg, module, new Date(), 1 ))
+        request.session.removeAttribute("msg")
+        request.session.removeAttribute("module")
+        request.session.removeAttribute("auth_name")
+    }
 }
