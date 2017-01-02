@@ -62,7 +62,9 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             Sql db = new Sql( conn )
 
             log.trace "CasAuthenticationProvider.casAuthentication doing CAS authentication"
-            def attributeMap = RCH.currentRequestAttributes().request.session.getAttribute( AbstractCasFilter.CONST_CAS_ASSERTION ).principal.attributes
+            def sessionObj = RCH.currentRequestAttributes().request.session
+            sessionObj.setAttribute("auth_name", sessionObj.getAttribute( AbstractCasFilter.CONST_CAS_ASSERTION ).principal.name)
+            def attributeMap = sessionObj.getAttribute( AbstractCasFilter.CONST_CAS_ASSERTION ).principal.attributes
             def assertAttributeValue = attributeMap[CH?.config?.banner.sso.authenticationAssertionAttribute]
 
             if(assertAttributeValue == null) {
@@ -99,7 +101,6 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             throw ae
         } catch (BadCredentialsException be)     {
             log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to BadCredentialsException: ${be.message}"
-            makeGuralogEntryOnFailure()
             throw be
         }catch (UsernameNotFoundException ue)     {
             log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to UsernameNotFoundException: ${ue.message}"
@@ -108,21 +109,9 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
         catch (e) {
             // We don't expect an exception here, as failed authentication should be reported via the above exceptions
             log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to exception: ${e.message}"
-            return null // this is a rare situation where we want to bury the exception 
+            return null // this is a rare situation where we want to bury the exception
         } finally {
             conn?.close()
         }
-    }
-
-    private void makeGuralogEntryOnFailure() {
-        def request = RequestContextHolder.currentRequestAttributes().request
-        def msg = request.session.getAttribute("msg")
-        def module = request.session.getAttribute("module")
-        def authName = request.session.getAttribute("auth_name")
-
-        Holders.getApplicationContext().publishEvent(new BannerAuthenticationEvent( authName, false, msg, module, new Date(), 1 ))
-        request.session.removeAttribute("msg")
-        request.session.removeAttribute("module")
-        request.session.removeAttribute("auth_name")
     }
 }

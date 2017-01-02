@@ -5,10 +5,12 @@
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Holders
 import net.hedtech.banner.controllers.ControllerUtils
+import net.hedtech.banner.security.CasAuthenticationFailureHandler
 import net.hedtech.banner.security.CasAuthenticationProvider
 import net.hedtech.jasig.cas.client.BannerSaml11ValidationFilter
 import org.jasig.cas.client.session.SingleSignOutHttpSessionListener
 import org.jasig.cas.client.util.HttpServletRequestWrapperFilter
+import org.springframework.security.cas.web.CasAuthenticationFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.security.web.util.matcher.RequestMatcher
 
@@ -98,6 +100,25 @@ class BannerSpringSecurityCasGrailsPlugin {
 
         casBannerAuthenticationProvider(CasAuthenticationProvider) {
             dataSource = ref(dataSource)
+        }
+
+        casAuthenticationFailureHandler(CasAuthenticationFailureHandler){
+            defaultFailureUrl = SpringSecurityUtils.securityConfig.failureHandler.defaultFailureUrl
+        }
+
+        casAuthenticationFilter(CasAuthenticationFilter){
+            authenticationManager = ref('authenticationManager')
+            sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
+            authenticationSuccessHandler = ref('authenticationSuccessHandler')
+            authenticationFailureHandler = ref('casAuthenticationFailureHandler')
+            rememberMeServices = ref('rememberMeServices')
+            authenticationDetailsSource = ref('authenticationDetailsSource')
+            serviceProperties = ref('casServiceProperties')
+            proxyGrantingTicketStorage = ref('casProxyGrantingTicketStorage')
+            filterProcessesUrl = conf.cas.filterProcessesUrl // '/j_spring_cas_security_check'
+            continueChainBeforeSuccessfulAuthentication = conf.apf.continueChainBeforeSuccessfulAuthentication // false
+            allowSessionCreation = conf.apf.allowSessionCreation // true
+            proxyReceptorUrl = conf.cas.proxyReceptorUrl
         }
 
         println '... finished configuring Banner Spring Security CAS\n'
