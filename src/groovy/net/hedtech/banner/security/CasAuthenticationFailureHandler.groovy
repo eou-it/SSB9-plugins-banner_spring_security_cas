@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class CasAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-        private static final Logger log = Logger.getLogger( "net.hedtech.banner.security.BannerAuthenticationFailureHandler" )
+        private static final Logger log = Logger.getLogger( "net.hedtech.banner.security.CasAuthenticationFailureHandler" )
 
         void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
 
