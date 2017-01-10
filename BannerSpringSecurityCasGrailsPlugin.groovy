@@ -5,7 +5,7 @@
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Holders
 import net.hedtech.banner.controllers.ControllerUtils
-import net.hedtech.banner.security.CasAuthenticationFailureHandler
+import net.hedtech.banner.security.BannerCasAuthenticationFailureHandler
 import net.hedtech.banner.security.CasAuthenticationProvider
 import net.hedtech.jasig.cas.client.BannerSaml11ValidationFilter
 import org.jasig.cas.client.session.SingleSignOutHttpSessionListener
@@ -102,15 +102,15 @@ class BannerSpringSecurityCasGrailsPlugin {
             dataSource = ref(dataSource)
         }
 
-        casAuthenticationFailureHandler(CasAuthenticationFailureHandler){
-            defaultFailureUrl = SpringSecurityUtils.securityConfig.failureHandler.defaultFailureUrl
+        bannerCasAuthenticationFailureHandler(BannerCasAuthenticationFailureHandler){
+            defaultFailureUrl = conf.failureHandler.defaultFailureUrl
         }
 
         casAuthenticationFilter(CasAuthenticationFilter){
             authenticationManager = ref('authenticationManager')
             sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
             authenticationSuccessHandler = ref('authenticationSuccessHandler')
-            authenticationFailureHandler = ref('casAuthenticationFailureHandler')
+            authenticationFailureHandler = ref('bannerCasAuthenticationFailureHandler')
             rememberMeServices = ref('rememberMeServices')
             authenticationDetailsSource = ref('authenticationDetailsSource')
             serviceProperties = ref('casServiceProperties')
