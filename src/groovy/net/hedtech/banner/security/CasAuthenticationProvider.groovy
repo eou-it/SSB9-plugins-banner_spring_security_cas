@@ -1,8 +1,9 @@
 /*******************************************************************************
- Copyright 2009-2014 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2016 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.security
 
+import grails.util.Holders
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.AuthorizationException
 import org.apache.log4j.Logger
@@ -12,7 +13,6 @@ import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 
 import org.springframework.context.ApplicationContext
-import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.DisabledException
@@ -20,6 +20,7 @@ import org.springframework.security.authentication.LockedException
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.RequestContextHolder as RCH
 
 
@@ -61,7 +62,9 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             Sql db = new Sql( conn )
 
             log.trace "CasAuthenticationProvider.casAuthentication doing CAS authentication"
-            def attributeMap = RCH.currentRequestAttributes().request.session.getAttribute( AbstractCasFilter.CONST_CAS_ASSERTION ).principal.attributes
+            def sessionObj = RCH.currentRequestAttributes().request.session
+            sessionObj.setAttribute("auth_name", sessionObj.getAttribute( AbstractCasFilter.CONST_CAS_ASSERTION ).principal.name)
+            def attributeMap = sessionObj.getAttribute( AbstractCasFilter.CONST_CAS_ASSERTION ).principal.attributes
             def assertAttributeValue = attributeMap[CH?.config?.banner.sso.authenticationAssertionAttribute]
 
             if(assertAttributeValue == null) {
@@ -106,10 +109,9 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
         catch (e) {
             // We don't expect an exception here, as failed authentication should be reported via the above exceptions
             log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to exception: ${e.message}"
-            return null // this is a rare situation where we want to bury the exception 
+            return null // this is a rare situation where we want to bury the exception
         } finally {
             conn?.close()
         }
     }
-
 }
