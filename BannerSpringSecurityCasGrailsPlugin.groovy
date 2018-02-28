@@ -1,5 +1,5 @@
 /* *****************************************************************************
- Copyright 2015-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2015-2018 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 
 import grails.plugin.springsecurity.SpringSecurityUtils
@@ -23,7 +23,7 @@ class BannerSpringSecurityCasGrailsPlugin {
     // and will be removed when the maven-publisher plugin correctly sets the groupId based on the following field.
     String groupId = "net.hedtech"
 
-    String version = '9.23'
+    String version = '9.27'
     String grailsVersion = '2.5.0 > *'
 
     def dependsOn = [
