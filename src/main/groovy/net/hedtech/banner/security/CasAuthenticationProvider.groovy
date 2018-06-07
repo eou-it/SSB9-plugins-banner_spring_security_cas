@@ -3,26 +3,18 @@
  *******************************************************************************/
 package net.hedtech.banner.security
 
-import grails.util.Holders
+import grails.util.Holders  as CH
+import grails.web.context.ServletContextHolder
 import groovy.sql.Sql
 import net.hedtech.banner.exceptions.AuthorizationException
 import org.apache.log4j.Logger
+import org.grails.web.util.GrailsApplicationAttributes
 import org.jasig.cas.client.util.AbstractCasFilter
-import grails.util.Holders  as CH
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
-
 import org.springframework.context.ApplicationContext
-import org.springframework.security.authentication.BadCredentialsException
-import org.springframework.security.authentication.CredentialsExpiredException
-import org.springframework.security.authentication.DisabledException
-import org.springframework.security.authentication.LockedException
-import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.authentication.*
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.RequestContextHolder as RCH
-
 
 /**
  * An authentication provider for Banner that authenticates a user using CAS.
