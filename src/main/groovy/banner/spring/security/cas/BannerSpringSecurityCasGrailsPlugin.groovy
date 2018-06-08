@@ -11,7 +11,12 @@ import org.springframework.security.web.util.matcher.RequestMatcher
 import javax.servlet.Filter
 
 class BannerSpringSecurityCasGrailsPlugin extends Plugin {
+    String groupId = "net.hedtech"
 
+    String version = '9.27'
+    def dependsOn = [
+            bannerCore: '9.28.1 => *'
+    ]
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.3.2 > *"
     // resources that are excluded from plugin packaging
@@ -48,8 +53,101 @@ Brief summary/description of the plugin.
     // Online location of the plugin's browseable source code.
 //    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
 
+//TODO ADD ALTERNATIVE FOR doWithWebDescriptor as this method is removed now
+   /* def doWithWebDescriptor = { xml ->
+
+        def conf = SpringSecurityUtils.securityConfig
+        if (!conf || !conf.cas.active) {
+            return
+        }
+
+        // add the filter right after the last context-param
+        def contextParam = xml.'context-param'
+        contextParam[contextParam.size() - 1] + {
+            'filter' {
+                'filter-name'('CAS Validation Filter')
+                'filter-class'(BannerSaml11ValidationFilter.name)
+                'init-param' {
+                    'param-name'('casServerUrlPrefix')
+                    'param-value'(conf.cas.serverUrlPrefix)
+                }
+                'init-param' {
+                    'param-name'('serverName')
+                    'param-value'(conf.cas.serverName)
+                }
+                'init-param' {
+                    'param-name'('redirectAfterValidation')
+                    'param-value'('true')
+                }
+                'init-param' {
+                    'param-name'('artifactParameterName')
+                    'param-value'(conf.cas.artifactParameter)
+                }
+                'init-param' {
+                    'param-name'('tolerance')
+                    'param-value'(conf.cas.tolerance)
+                }
+            }
+            'filter' {
+                'filter-name'('CAS HttpServletRequest Wrapper Filter')
+                'filter-class'(HttpServletRequestWrapperFilter.name)
+            }
+        }
+
+        // add the filter-mapping right after the last filter
+        def mappingLocation = xml.'filter'
+        mappingLocation[mappingLocation.size() - 1] + {
+            'filter-mapping' {
+                'filter-name'('CAS Validation Filter')
+                'url-pattern'('/*')
+            }
+            'filter-mapping' {
+                'filter-name'('CAS HttpServletRequest Wrapper Filter')
+                'url-pattern'('/*')
+            }
+        }
+
+        def filterMapping = xml.'filter-mapping'
+        filterMapping[filterMapping.size() - 1] + {
+            'listener' {
+                'listener-class'(SingleSignOutHttpSessionListener.name)
+            }
+        }
+    } */
+
+
     Closure doWithSpring() { {->
             // TODO Implement runtime spring config (optional)
+            def conf = SpringSecurityUtils.securityConfig
+            if (!conf || !conf.cas.active) {
+                return
+            }
+            println '\nConfiguring Banner Spring Security CAS ...'
+
+            casBannerAuthenticationProvider(CasAuthenticationProvider) {
+                dataSource = ref(dataSource)
+            }
+
+            bannerCasAuthenticationFailureHandler(BannerCasAuthenticationFailureHandler){
+                defaultFailureUrl = conf.failureHandler.defaultFailureUrl
+            }
+
+            casAuthenticationFilter(CasAuthenticationFilter){
+                authenticationManager = ref('authenticationManager')
+                sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
+                authenticationSuccessHandler = ref('authenticationSuccessHandler')
+                authenticationFailureHandler = ref('bannerCasAuthenticationFailureHandler')
+                rememberMeServices = ref('rememberMeServices')
+                authenticationDetailsSource = ref('authenticationDetailsSource')
+                serviceProperties = ref('casServiceProperties')
+                proxyGrantingTicketStorage = ref('casProxyGrantingTicketStorage')
+                filterProcessesUrl = conf.cas.filterProcessesUrl // '/j_spring_cas_security_check'
+                continueChainBeforeSuccessfulAuthentication = conf.apf.continueChainBeforeSuccessfulAuthentication // false
+                allowSessionCreation = conf.apf.allowSessionCreation // true
+                proxyReceptorUrl = conf.cas.proxyReceptorUrl
+            }
+
+            println '... finished configuring Banner Spring Security CAS\n'
         }
     }
 
@@ -101,6 +199,12 @@ Brief summary/description of the plugin.
         }
         applicationContext.springSecurityFilterChain.filterChainMap = filterChainMap
     }
+
+    private def isSsbEnabled() {
+        Holders.config.ssbEnabled instanceof Boolean ? Holders.config.ssbEnabled : false
+    }
+
+    private createBeanList(names, ctx) { names.collect { name -> ctx.getBean(name) } }
 
     void onChange(Map<String, Object> event) {
         // TODO Implement code that is executed when any artefact that this plugin is
