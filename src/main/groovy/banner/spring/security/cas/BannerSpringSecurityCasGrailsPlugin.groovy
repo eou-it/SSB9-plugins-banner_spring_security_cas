@@ -8,6 +8,10 @@ import grails.util.Holders
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.security.web.util.matcher.RequestMatcher
 
+import net.hedtech.banner.security.CasAuthenticationProvider
+import net.hedtech.banner.security.BannerCasAuthenticationFailureHandler
+import org.springframework.security.cas.web.CasAuthenticationFilter
+
 import javax.servlet.Filter
 
 class BannerSpringSecurityCasGrailsPlugin extends Plugin {
