@@ -12,7 +12,7 @@ Copyright 2009-2012 Ellucian Company L.P. and its affiliates.
         <link rel="stylesheet" href="${resource(plugin: 'bannerCore', dir: 'css', file: 'main.css')}"/>
         <link rel="stylesheet" href="${resource(plugin: 'bannerCore', dir: 'css', file: 'button.css')}"/>
         <g:set var="actionLabel" value="${g.message(code: 'net.hedtech.banner.access.denied.dialog.action')}"/>
-        <link rel="shortcut icon" href="${resource(plugin: 'bannerCore', dir: 'images', file: 'favicon.ico')}" type="image/x-icon"/>
+        <asset:link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
     </head>
     <body>
         <div class="error">
