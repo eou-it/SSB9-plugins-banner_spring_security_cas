@@ -3,8 +3,9 @@ package banner.spring.security.cas
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
 import grails.util.Holders
-//TODO After adding Banner_Core Dependency uncomment below lines.
-//import net.hedtech.banner.controllers.ControllerUtils
+import net.hedtech.banner.controllers.ControllerUtils
+import org.springframework.security.web.DefaultSecurityFilterChain
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.security.web.util.matcher.RequestMatcher
 
@@ -17,9 +18,10 @@ import javax.servlet.Filter
 class BannerSpringSecurityCasGrailsPlugin extends Plugin {
     String groupId = "net.hedtech"
 
-    String version = '9.27'
+    String version = '9.28'
     def dependsOn = [
-            bannerCore: '9.28.1 => *'
+            bannerCore: '9.28.1 => *',
+            springSecurityCas:'3.1.0'
     ]
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.3.2 > *"
@@ -121,8 +123,12 @@ Brief summary/description of the plugin.
 
 
     Closure doWithSpring() { {->
+        println "I am in Banner CAS"
             // TODO Implement runtime spring config (optional)
             def conf = SpringSecurityUtils.securityConfig
+        println "**********************************In banner cas conf.saml ********************************************"
+        println conf.cas
+        println "*****************************************  **********************************************************"
             if (!conf || !conf.cas.active) {
                 return
             }
@@ -173,11 +179,11 @@ Brief summary/description of the plugin.
             providerNames.addAll conf.providerNames
         } else {
             //TODO After adding Banner_Core Dependency uncomment below lines.
-            /*if(ControllerUtils.isGuestAuthenticationEnabled()){
+            if(ControllerUtils.isGuestAuthenticationEnabled()){
                 providerNames = ['casBannerAuthenticationProvider','selfServiceBannerAuthenticationProvider','bannerAuthenticationProvider']
-            } else{*/
+            } else{
                 providerNames = ['casBannerAuthenticationProvider']
-           /* }*/
+            }
         }
         applicationContext.authenticationManager.providers = createBeanList(providerNames, applicationContext)
 
@@ -194,14 +200,14 @@ Brief summary/description of the plugin.
                 break
         }
 
-        LinkedHashMap<RequestMatcher, List<Filter>> filterChainMap = new LinkedHashMap()
+        List<SecurityFilterChain> chains = new ArrayList<SecurityFilterChain>()
         filterChain.each { key, value ->
             def filters = value.toString().split(',').collect {
                 name -> applicationContext.getBean(name)
             }
-            filterChainMap[new AntPathRequestMatcher(key)] = filters
+            chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher(key), filters))
         }
-        applicationContext.springSecurityFilterChain.filterChainMap = filterChainMap
+        applicationContext.springSecurityFilterChain.filterChains = chains
     }
 
     private def isSsbEnabled() {

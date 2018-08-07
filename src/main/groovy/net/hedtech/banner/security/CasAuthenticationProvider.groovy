@@ -1,13 +1,13 @@
 /*******************************************************************************
- Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2018 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.security
 
 import grails.util.Holders  as CH
 import grails.web.context.ServletContextHolder
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 import net.hedtech.banner.exceptions.AuthorizationException
-import org.apache.log4j.Logger
 import org.grails.web.util.GrailsApplicationAttributes
 import org.jasig.cas.client.util.AbstractCasFilter
 import org.springframework.context.ApplicationContext
@@ -19,13 +19,10 @@ import org.springframework.web.context.request.RequestContextHolder as RCH
 /**
  * An authentication provider for Banner that authenticates a user using CAS.
  */
+@Slf4j
 public class CasAuthenticationProvider implements AuthenticationProvider {
 
-    // note: using 'getClass()' here doesn't work
-    private static final Logger log = Logger.getLogger( "net.hedtech.banner.security.CasAuthenticationProvider" )
-
     def dataSource  // injected by Spring
-
 
     public boolean supports( Class clazz ) {
         log.trace "CasBannerAuthenticationProvider.supports( $clazz ) will return ${isCasEnabled()}"
@@ -60,7 +57,7 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             def assertAttributeValue = attributeMap[CH?.config?.banner.sso.authenticationAssertionAttribute]
 
             if(assertAttributeValue == null) {
-                log.fatal("System is configured for CAS authentication and identity assertion is $assertAttributeValue")  // NULL
+                log.error("System is configured for CAS authentication and identity assertion is $assertAttributeValue")  // NULL
                 throw new UsernameNotFoundException("System is configured for CAS authentication and identity assertion is $assertAttributeValue")
             }
 
@@ -80,22 +77,22 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             bannerAuthenticationToken
         }
         catch (DisabledException de)           {
-            log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to DisabledException: ${de.message}"
+            log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to DisabledException: ${de.message}"
             throw de
         } catch (CredentialsExpiredException ce) {
-            log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to CredentialsExpiredException: ${ce.message}"
+            log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to CredentialsExpiredException: ${ce.message}"
             throw ce
         } catch (LockedException le)             {
-            log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to LockedException: ${le.message}"
+            log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to LockedException: ${le.message}"
             throw le
         } catch(AuthorizationException ae) {
-            log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to AuthorizationException: ${ae.message}"
+            log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to AuthorizationException: ${ae.message}"
             throw ae
         } catch (BadCredentialsException be)     {
-            log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to BadCredentialsException: ${be.message}"
+            log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to BadCredentialsException: ${be.message}"
             throw be
         }catch (UsernameNotFoundException ue)     {
-            log.fatal "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to UsernameNotFoundException: ${ue.message}"
+            log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to UsernameNotFoundException: ${ue.message}"
             throw ue
         }
         catch (e) {
