@@ -126,7 +126,7 @@ Brief summary/description of the plugin.
         println "I am in Banner CAS"
             // TODO Implement runtime spring config (optional)
             def conf = SpringSecurityUtils.securityConfig
-        println "**********************************In banner cas conf.saml ********************************************"
+        println "**********************************In banner cas conf ********************************************"
         println conf.cas
         println "*****************************************  **********************************************************"
             if (!conf || !conf.cas.active) {
@@ -189,7 +189,8 @@ Brief summary/description of the plugin.
 
         // Define the spring security filters
         def authenticationProvider = Holders?.config?.banner.sso.authenticationProvider
-        LinkedHashMap<String, String> filterChain = new LinkedHashMap();
+        LinkedHashMap<String, String> filterChain = new LinkedHashMap()
+        println "authenticationProvider === " +authenticationProvider
         switch (authenticationProvider) {
             case 'cas':
                 filterChain['/**/api/**'] = 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor'
