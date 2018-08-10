@@ -147,14 +147,6 @@ grails {
             }
             useRequestMapDomainClass = false
             //TODO Commenting the imports and corresponding changes as imports in not supported here
-            //securityConfigType = SecurityConfigType.InterceptUrlMap
-            interceptUrlMap = [
-                    '/': ['ROLE_SELFSERVICE-ALLROLES_BAN_DEFAULT_M', 'ROLE_SELFSERVICE-STUDENT_BAN_DEFAULT_M'],
-                    '/login/**': ['IS_AUTHENTICATED_ANONYMOUSLY'],
-                    '/logout/**': ['IS_AUTHENTICATED_ANONYMOUSLY'],
-                    '/index': ['IS_AUTHENTICATED_ANONYMOUSLY'],
-                    '/**': ['IS_AUTHENTICATED_ANONYMOUSLY']
-            ]
         }
     }
 }
@@ -186,19 +178,3 @@ cache.region.factory_class = 'org.hibernate.cache.SingletonEhCacheRegionFactory'
 singleSession = true // configure OSIV singleSession mode
 flush.mode = 'manual' // OSIV session flush mode outside of transactional context
 
-
-// environment specific settings
-environments {
-    development {
-        dataSource {
-        }
-    }
-    test {
-        dataSource {
-        }
-    }
-    production {
-        dataSource {
-        }
-    }
-}

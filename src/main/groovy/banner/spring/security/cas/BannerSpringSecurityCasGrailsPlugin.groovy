@@ -23,6 +23,9 @@ class BannerSpringSecurityCasGrailsPlugin extends Plugin {
             bannerCore: '9.28.1 => *',
             springSecurityCas:'3.1.0'
     ]
+
+    List loadAfter = ['bannerCore','springSecurityCas']
+
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.3.2 > *"
     // resources that are excluded from plugin packaging
@@ -123,12 +126,8 @@ Brief summary/description of the plugin.
 
 
     Closure doWithSpring() { {->
-        println "I am in Banner CAS"
             // TODO Implement runtime spring config (optional)
             def conf = SpringSecurityUtils.securityConfig
-        println "**********************************In banner cas conf ********************************************"
-        println conf.cas
-        println "*****************************************  **********************************************************"
             if (!conf || !conf.cas.active) {
                 return
             }
@@ -188,7 +187,7 @@ Brief summary/description of the plugin.
         applicationContext.authenticationManager.providers = createBeanList(providerNames, applicationContext)
 
         // Define the spring security filters
-        def authenticationProvider = Holders?.config?.banner.sso.authenticationProvider
+        def authenticationProvider = Holders.config.banner.sso.authenticationProvider
         LinkedHashMap<String, String> filterChain = new LinkedHashMap()
         println "authenticationProvider === " +authenticationProvider
         switch (authenticationProvider) {
