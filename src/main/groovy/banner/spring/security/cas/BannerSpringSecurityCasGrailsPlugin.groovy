@@ -126,8 +126,15 @@ Brief summary/description of the plugin.
 
 
     Closure doWithSpring() { {->
+        println "--------- In Banner CAS doWithSpring ----------------"
             // TODO Implement runtime spring config (optional)
             def conf = SpringSecurityUtils.securityConfig
+        println "********************************** In banner cas conf ********************************************"
+        println "conf.cas " + conf.cas
+        println "Holders.config.size()"  + Holders.config.size()
+        println "\n AuthenticationProvider = " + Holders.config.banner.sso.authenticationProvider
+        println "*****************************************  **********************************************************\n"
+
             if (!conf || !conf.cas.active) {
                 return
             }
@@ -165,9 +172,16 @@ Brief summary/description of the plugin.
     }
 
     void doWithApplicationContext() {
+        def conf = SpringSecurityUtils.securityConfig
+        println "--------- In Banner CAS doWithApplicationContext ----------------"
         // TODO Implement post initialization spring config (optional)
         // build providers list here to give dependent plugins a chance to register some
-        def conf = SpringSecurityUtils.securityConfig
+        println "********************************** In Banner CAS conf ********************************************"
+        println "conf.cas " + conf.cas
+        println "Holders.config.size()"  + Holders.config.size()
+        println "\n AuthenticationProvider = " + Holders.config.banner.sso.authenticationProvider
+        println "*****************************************  **********************************************************"
+        println "--------- In Banner CAS doWithApplicationContext End ---------------- \n"
         if (!conf || !conf.cas.active) {
             return
         }
@@ -189,7 +203,7 @@ Brief summary/description of the plugin.
         // Define the spring security filters
         def authenticationProvider = Holders.config.banner.sso.authenticationProvider
         LinkedHashMap<String, String> filterChain = new LinkedHashMap()
-        println "authenticationProvider === " +authenticationProvider
+        println "AuthenticationProvider === " +authenticationProvider
         switch (authenticationProvider) {
             case 'cas':
                 filterChain['/**/api/**'] = 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor'
@@ -207,6 +221,7 @@ Brief summary/description of the plugin.
             }
             chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher(key), filters))
         }
+        println "Chains in CAS ==" + chains
         applicationContext.springSecurityFilterChain.filterChains = chains
     }
 
