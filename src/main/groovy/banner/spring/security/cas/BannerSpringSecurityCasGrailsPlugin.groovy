@@ -1,6 +1,7 @@
 package banner.spring.security.cas
 
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.web.GrailsSecurityFilterChain
 import grails.plugins.Plugin
 import grails.util.Holders
 import net.hedtech.banner.controllers.ControllerUtils
@@ -203,25 +204,25 @@ Brief summary/description of the plugin.
         // Define the spring security filters
         def authenticationProvider = Holders.config.banner.sso.authenticationProvider
         LinkedHashMap<String, String> filterChain = new LinkedHashMap()
+        List<Map<String, ?>> filterChains = []
         println "AuthenticationProvider === " +authenticationProvider
         switch (authenticationProvider) {
             case 'cas':
-                filterChain['/**/api/**'] = 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor'
-                filterChain['/**/qapi/**'] = 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor'
-                filterChain['/**'] = 'securityContextPersistenceFilter,logoutFilter,bannerMepCodeFilter,casAuthenticationFilter,authenticationProcessingFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor'
+                filterChains << [pattern: '/**/api/**',   filters: 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor']
+                filterChains << [pattern: '/**/qapi/**',  filters: 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor']
+                filterChains << [pattern: '/**',          filters: 'securityContextPersistenceFilter,logoutFilter,bannerMepCodeFilter,casAuthenticationFilter,authenticationProcessingFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor']
                 break
             default:
                 break
         }
 
-        List<SecurityFilterChain> chains = new ArrayList<SecurityFilterChain>()
-        filterChain.each { key, value ->
-            def filters = value.toString().split(',').collect {
-                name -> applicationContext.getBean(name)
-            }
-            chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher(key), filters))
+        List<GrailsSecurityFilterChain> chains = new ArrayList<GrailsSecurityFilterChain>()
+        for (Map<String, ?> entry in filterChains) {
+            println " FilterChains Entry in CAS === " + entry
+            String value = (entry.filters ?: '').toString().trim()
+            List<Filter> filters = value.toString().split(',').collect { String name -> applicationContext.getBean(name, Filter) }
+            chains << new GrailsSecurityFilterChain(entry.pattern as String, filters)
         }
-        println "Chains in CAS ==" + chains
         applicationContext.springSecurityFilterChain.filterChains = chains
     }
 
