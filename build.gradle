@@ -59,6 +59,9 @@ dependencies {
     testCompile "org.grails:grails-web-testing-support"
     //Added for BannerXE Spring security CAS Plugin dependency
     compile "org.grails.plugins:spring-security-cas:3.1.0"
+    compile 'org.jasig.cas.client:cas-client-support-saml:3.4.1', {
+        exclude module: 'slf4j-api'
+    }
 
     //Banner-XE Dependency
     compile 'joda-time:joda-time:1.6.2'
@@ -168,7 +171,7 @@ dependencies {
 
     compile "xml-apis:xml-apis:1.4.01"
 
-    compile("org.jasig.cas.client:cas-client-core:3.3.3"){
+    /*compile("org.jasig.cas.client:cas-client-core:3.3.3"){
         exclude module: 'commons-codec'
         exclude module: 'commons-logging'
         exclude module: 'junit'
@@ -180,7 +183,7 @@ dependencies {
         exclude module: 'spring-core'
         exclude module: 'spring-test'
         exclude module: 'xmlsec'
-    }
+    }*/
 
     //TODO
     //test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
@@ -201,21 +204,9 @@ bootRun {
 
 // enable if you wish to package this plugin as a standalone application
 bootRepackage.enabled = false
-grailsPublish {
-    // TODO: Provide values here
-    user = 'user'
-    key = 'key'
-    githubSlug = 'foo/bar'
-    license {
-        name = 'Apache-2.0'
-    }
-    title = "My Plugin"
-    desc = "Full plugin description"
-    developers = [johndoe:"John Doe"]
-}
-
-
 
 assets {
     packagePlugin = true
 }
+
+

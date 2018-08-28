@@ -1,16 +1,20 @@
 package banner.spring.security.cas
 
+import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.web.GrailsSecurityFilterChain
+import grails.plugin.springsecurity.web.filter.GrailsAnonymousAuthenticationFilter
 import grails.plugins.Plugin
 import grails.util.Holders
+import groovy.transform.CompileDynamic
 import net.hedtech.banner.controllers.ControllerUtils
-import org.springframework.security.web.DefaultSecurityFilterChain
-import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
-import org.springframework.security.web.util.matcher.RequestMatcher
-
 import net.hedtech.banner.security.CasAuthenticationProvider
+import net.hedtech.jasig.cas.client.BannerSaml11ValidationFilter
+import org.jasig.cas.client.util.HttpServletRequestWrapperFilter
+import org.jasig.cas.client.validation.Saml11TicketValidationFilter
+import org.springframework.boot.web.servlet.FilterRegistrationBean
+import grails.core.GrailsApplication
+
 import net.hedtech.banner.security.BannerCasAuthenticationFailureHandler
 import org.springframework.security.cas.web.CasAuthenticationFilter
 
@@ -130,6 +134,8 @@ Brief summary/description of the plugin.
         println "--------- In Banner CAS doWithSpring ----------------"
             // TODO Implement runtime spring config (optional)
             def conf = SpringSecurityUtils.securityConfig
+        def application = grailsApplication
+        def config = application.config
         println "********************************** In banner cas conf ********************************************"
         println "conf.cas " + conf.cas
         println "Holders.config.size()"  + Holders.config.size()
@@ -164,6 +170,24 @@ Brief summary/description of the plugin.
                 proxyReceptorUrl = conf.cas.proxyReceptorUrl
             }
 
+        httpServletRequestWrapperFilter(FilterRegistrationBean, ) {
+            filter = bean(HttpServletRequestWrapperFilter)
+        }
+
+
+        //bannerSaml11ValidationFilter(BannerSaml11ValidationFilter)
+
+        //SpringSecurityUtils.registerFilter 'httpServletRequestWrapperFilter', SecurityFilterPosition.CAS_FILTER.+1
+        //SpringSecurityUtils.registerFilter 'bannerSaml11ValidationFilter', SecurityFilterPosition.CAS_FILTER+5
+
+        bannerSaml11ValidationFilter(Saml11TicketValidationFilter) {
+            casServerUrlPrefix = conf.cas.serverUrlPrefix
+/*            serverName = conf.cas.serverName
+            redirectAfterValidation = true
+            artifactParameterName = conf.cas.artifactParameter
+            tolerance = conf.cas.tolerance*/
+        }
+        println " \n bannerSaml11ValidationFilter " + bannerSaml11ValidationFilter
             println '... finished configuring Banner Spring Security CAS\n'
         }
     }
@@ -202,15 +226,28 @@ Brief summary/description of the plugin.
         applicationContext.authenticationManager.providers = createBeanList(providerNames, applicationContext)
 
         // Define the spring security filters
+
+        /*FilterRegistrationBean registration = new FilterRegistrationBean()
+        //registration.setFilter(new Saml11AuthenticationFilter())
+        registration.setFilter(new BannerSaml11ValidationFilter())
+        registration.addInitParameter("casServerUrlPrefix", conf.cas.serverUrlPrefix)
+        registration.addInitParameter("serverName", conf.cas.serverName)
+        registration.addInitParameter("redirectAfterValidation", "true")
+        registration.addInitParameter("artifactParameterName", conf.cas.artifactParameter)
+        //registration.addInitParameter("tolerance", conf.cas.tolerance)
+        registration.setName("bannerSaml11ValidationFilter")*/
+
+        println "bannerSaml11ValidationFilter  == " + bannerSaml11ValidationFilter
+
         def authenticationProvider = Holders.config.banner.sso.authenticationProvider
         LinkedHashMap<String, String> filterChain = new LinkedHashMap()
         List<Map<String, ?>> filterChains = []
         println "AuthenticationProvider === " +authenticationProvider
         switch (authenticationProvider) {
             case 'cas':
-                filterChains << [pattern: '/**/api/**',   filters: 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor']
-                filterChains << [pattern: '/**/qapi/**',  filters: 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor']
-                filterChains << [pattern: '/**',          filters: 'securityContextPersistenceFilter,logoutFilter,bannerMepCodeFilter,casAuthenticationFilter,authenticationProcessingFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor']
+                filterChains << [pattern: '/**/api/**',   filters: 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor,bannerSaml11ValidationFilter']
+                filterChains << [pattern: '/**/qapi/**',  filters: 'statelessSecurityContextPersistenceFilter,bannerMepCodeFilter,authenticationProcessingFilter,basicAuthenticationFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,basicExceptionTranslationFilter,filterInvocationInterceptor,bannerSaml11ValidationFilter']
+                filterChains << [pattern: '/**',          filters: 'securityContextPersistenceFilter,logoutFilter,bannerMepCodeFilter,casAuthenticationFilter,authenticationProcessingFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor,bannerSaml11ValidationFilter']
                 break
             default:
                 break
