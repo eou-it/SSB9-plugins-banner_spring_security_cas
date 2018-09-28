@@ -19,7 +19,7 @@ import javax.servlet.Filter
 class BannerSpringSecurityCasGrailsPlugin extends Plugin {
     String groupId = "net.hedtech"
 
-    String version = '9.28'
+    String version = '9.30'
     def dependsOn = [
             bannerCore: '9.28.1 => *',
             springSecurityCas:'3.1.0'
