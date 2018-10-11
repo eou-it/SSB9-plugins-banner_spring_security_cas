@@ -4,12 +4,21 @@
 
 package net.hedtech.jasig.cas.client
 
+import groovy.util.logging.Slf4j
+import org.apache.catalina.core.ApplicationFilterConfig
+import org.apache.tomcat.util.descriptor.web.FilterDef
 import org.jasig.cas.client.Protocol
-import org.jasig.cas.client.validation.Saml11TicketValidationFilter
+import org.jasig.cas.client.configuration.ConfigurationKeys
+import org.jasig.cas.client.ssl.HttpURLConnectionFactory
+import org.jasig.cas.client.ssl.HttpsURLConnectionFactory
+import org.jasig.cas.client.validation.AbstractTicketValidationFilter
+import org.jasig.cas.client.validation.Saml11TicketValidator
 import org.jasig.cas.client.validation.TicketValidator
+import org.springframework.security.authentication.AuthenticationManager
 
 import javax.servlet.FilterConfig
 import javax.servlet.ServletException
+import java.lang.reflect.Method
 
 /**
  * Saml11ValidationFilter of CAS client 3.1.8 does give an option to customise
@@ -26,32 +35,18 @@ import javax.servlet.ServletException
  * filter bean. This class is made for that. To allow fall back mechanism if a old CAS
  * server is being used which cannot support SAML 1.1 compliance.
  */
-class BannerSaml11ValidationFilter extends Saml11TicketValidationFilter {
-    public BannerSaml11ValidationFilter() {
-        super.setRedirectAfterValidation(true)
-        super.setServerName('http://localhost:8080')
-        super.setIgnoreInitConfiguration(true)
-        //this.setTicketValidator(super.getTicketValidator(config))
+@Slf4j
+class BannerSaml11ValidationFilter extends AbstractTicketValidationFilter {
+        public BannerSaml11ValidationFilter() {
+        super(Protocol.SAML11)
     }
 
-    protected final void initInternal(final FilterConfig filterConfig) throws ServletException {
-       println " I am in initInternal with filterConfig " + filterConfig
-        super.init()
+    protected final TicketValidator getTicketValidator(FilterConfig filterConfig) {
+        Saml11TicketValidator validator = new Saml11TicketValidator(filterConfig.getInitParameter("casServerUrlPrefix"))
+        validator.setRenew(true)
+        //validator.setRenew(getBoolean(filterConfig.getInitParameter("renew")))
+        return validator;
     }
-
-     /*TicketValidator getTicketValidator(FilterConfig filterConfig) {
-        println "I am in BannerSaml11ValidationFilter ----\n" + filterConfig
-        final Saml11TicketValidator validator = new Saml11TicketValidator('https://localhost:9443/cas')
-        final long tolerance = getLong(ConfigurationKeys.TOLERANCE);
-        validator.setTolerance(tolerance)
-        validator.setRenew(getBoolean(ConfigurationKeys.RENEW))
-
-        final HttpURLConnectionFactory factory = new HttpsURLConnectionFactory(getHostnameVerifier(), getSSLConfig());
-        validator.setURLConnectionFactory(factory)
-
-        validator.setEncoding(getString(ConfigurationKeys.ENCODING));
-        super.setTicketValidator(validator)
-        return validator
-    }*/
 }
+
 

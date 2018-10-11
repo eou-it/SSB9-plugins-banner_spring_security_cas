@@ -57,38 +57,48 @@ dependencies {
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails:grails-web-testing-support"
+
+    //Added for Hibernate dependency
+    compile "org.grails.plugins:hibernate5"
+
+    compile "org.hibernate:hibernate-core:5.1.5.Final"
+    compile "org.hibernate:hibernate-ehcache:5.1.5.Final"
+
     //Added for BannerXE Spring security CAS Plugin dependency
-    compile "org.grails.plugins:spring-security-cas:3.1.0"
+    compile("org.grails.plugins:spring-security-cas:3.1.0") {
+        //exclude module: 'cas-client-core'
+    }
+    //compile 'org.grails.plugins:spring-security-cas:3.1.1.BUILD-SNAPSHOT'
+
+    //migrated dependencies from grails-2.5 banner_spring_security_cas plugin
+
+    compile "joda-time:joda-time:1.6.2"
     compile 'org.jasig.cas.client:cas-client-support-saml:3.4.1', {
         exclude module: 'slf4j-api'
     }
-
-    //Banner-XE Dependency
-    compile 'joda-time:joda-time:1.6.2'
-
-    compile("org.opensaml:xmltooling:1.3.4"){
-        exclude group:"org.bouncycastle", module:"bcprov-jdk15"
-        exclude group:"commons-codec", module:"commons-codec"
-        exclude module:"jcip-annotations"
-        exclude module:"jcl-over-slf4j"
-        exclude group:"org.opensaml", module:"joda-time"
-        exclude module:"jul-to-slf4j"
-        exclude module:"junit"
-        exclude module:"log4j-over-slf4j"
-        exclude module:"logback-classic"
-        exclude module:"not-yet-commons-ssl"
-        exclude module:"serializer"
-        exclude module:"slf4j-api"
-        exclude module:"testng"
-        exclude module:"xalan"
-        exclude module:"xercesImpl"
-        exclude module:"xml-apis"
-        exclude module:"xml-resolver"
-        exclude module:"xmlsec"
-        exclude module:"xmlunit"
+    compile("org.opensaml:xmltooling:1.3.4") {
+        exclude group: "org.bouncycastle", module: "bcprov-jdk15"
+        exclude group: "commons-codec", module: "commons-codec"
+        exclude module: "jcip-annotations"
+        exclude module: "jcl-over-slf4j"
+        exclude group: "org.opensaml", module: "joda-time"
+        exclude module: "jul-to-slf4j"
+        exclude module: "junit"
+        exclude module: "log4j-over-slf4j"
+        exclude module: "logback-classic"
+        exclude module: "not-yet-commons-ssl"
+        exclude module: "serializer"
+        exclude module: "slf4j-api"
+        exclude module: "testng"
+        exclude module: "xalan"
+        exclude module: "xercesImpl"
+        exclude module: "xml-apis"
+        exclude module: "xml-resolver"
+        exclude module: "xmlsec"
+        exclude module: "xmlunit"
     }
 
-    compile("org.opensaml:opensaml:2.5.3"){
+    compile("org.opensaml:opensaml:2.5.3") {
         exclude module: 'commons-codec'
         exclude module: 'commons-collections'
         exclude module: 'commons-lang'
@@ -189,24 +199,23 @@ dependencies {
     //test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
     runtime "org.apache.santuario:xmlsec:1.4.3"
-}
-// Added for BannerXE - Internal plugin dependency
-grails {
-    plugins {
-        compile project(':banner-core')
-    }
-}
 
-bootRun {
-    jvmArgs('-Dspring.output.ansi.enabled=always')
-    addResources = true
-}
+// Added for BannerXE - Internal plugin dependency
+    grails {
+        plugins {
+            compile project(':banner-core')
+        }
+    }
+
+    bootRun {
+        jvmArgs('-Dspring.output.ansi.enabled=always')
+        addResources = true
+    }
 
 // enable if you wish to package this plugin as a standalone application
-bootRepackage.enabled = false
+    bootRepackage.enabled = false
 
-assets {
-    packagePlugin = true
+    assets {
+        packagePlugin = true
+    }
 }
-
-

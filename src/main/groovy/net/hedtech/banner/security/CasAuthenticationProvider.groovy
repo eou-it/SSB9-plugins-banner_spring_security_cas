@@ -32,8 +32,11 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
 
     public boolean isNotExcludedFromSSO() {
         def theUrl = RCH.currentRequestAttributes().request.forwardURI
-        def excludedUrlPattern = CH?.config.banner.sso.excludedUrlPattern.toString() // e.g., 'guest'
-        !("$theUrl".contains( excludedUrlPattern ))
+        def excludedUrlPattern = ''
+        excludedUrlPattern = CH.config.banner.sso.excludedUrlPattern?.toString() ?:'' // e.g., 'guest'
+        println "theUrl = ${theUrl}"
+        println "excludedUrlPattern = ${excludedUrlPattern}"
+        !("$theUrl"?.contains( excludedUrlPattern ))
     }
 
 
@@ -44,6 +47,8 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
 
     public Authentication authenticate( Authentication authentication ) {
         log.trace "CasAuthenticationProvider.authenticate invoked for ${authentication.name}"
+        println "----------------------------------"
+        println "CasAuthenticationProvider.authenticate invoked for ${authentication.name}"
 
         def conn
         try {
