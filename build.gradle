@@ -199,7 +199,7 @@ dependencies {
     //test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
     runtime "org.apache.santuario:xmlsec:1.4.3"
-
+}
 // Added for BannerXE - Internal plugin dependency
     grails {
         plugins {
@@ -218,4 +218,5 @@ dependencies {
     assets {
         packagePlugin = true
     }
-}
+
+
