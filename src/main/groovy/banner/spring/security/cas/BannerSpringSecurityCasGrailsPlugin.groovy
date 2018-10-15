@@ -5,6 +5,9 @@ import grails.plugin.springsecurity.web.GrailsSecurityFilterChain
 import grails.plugins.Plugin
 import grails.util.Holders
 import net.hedtech.banner.controllers.ControllerUtils
+import net.hedtech.jasig.cas.client.BannerSaml11ValidationFilter
+import org.jasig.cas.client.session.SingleSignOutHttpSessionListener
+import org.jasig.cas.client.util.HttpServletRequestWrapperFilter
 import org.springframework.security.web.DefaultSecurityFilterChain
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
@@ -22,10 +25,19 @@ class BannerSpringSecurityCasGrailsPlugin extends Plugin {
     String version = '9.30'
     def dependsOn = [
             bannerCore: '9.28.1 => *',
+            bannerGeneralUtility:'9.28.1 => *',
             springSecurityCas:'3.1.0'
     ]
 
-    List loadAfter = ['bannerCore','springSecurityCas']
+   // List loadAfter = ['bannerCore','springSecurityCas']
+
+    List loadAfter = ['bannerCore','bannerGeneralUtility','springSecuritySaml','springSecurityCas']
+    // List LoadBefore = ['springSecurityCore']
+   /* def dependsOn = [
+            bannerCore: '9.28.1 => *',
+
+            springSecuritySaml: '3.3.0 => *'
+    ]*/
 
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.3.2 > *"
@@ -68,11 +80,14 @@ Brief summary/description of the plugin.
 
         def conf = SpringSecurityUtils.securityConfig
         if (!conf || !conf.cas.active) {
-            return
+             return
+         }
+        if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
+           return
         }
 
         // add the filter right after the last context-param
-        def contextParam = xml.'context-param'
+       def contextParam = xml.'context-param'
         contextParam[contextParam.size() - 1] + {
             'filter' {
                 'filter-name'('CAS Validation Filter')
@@ -123,7 +138,7 @@ Brief summary/description of the plugin.
                 'listener-class'(SingleSignOutHttpSessionListener.name)
             }
         }
-    } */
+    }*/
 
 
     Closure doWithSpring() { {->
@@ -136,7 +151,11 @@ Brief summary/description of the plugin.
         println "\n AuthenticationProvider = " + Holders.config.banner.sso.authenticationProvider
         println "*****************************************  **********************************************************\n"
 
-            if (!conf || !conf.cas.active) {
+           /* if (!conf || !conf.cas.active) {
+                return
+            }*/
+
+            if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
                 return
             }
             println '\nConfiguring Banner Spring Security CAS ...'
@@ -183,7 +202,10 @@ Brief summary/description of the plugin.
         println "\n AuthenticationProvider = " + Holders.config.banner.sso.authenticationProvider
         println "*****************************************  **********************************************************"
         println "--------- In Banner CAS doWithApplicationContext End ---------------- \n"
-        if (!conf || !conf.cas.active) {
+        /*if (!conf || !conf.cas.active) {
+            return
+        }*/
+        if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
             return
         }
         def providerNames = []
