@@ -155,7 +155,7 @@ Brief summary/description of the plugin.
                 return
             }*/
 
-            if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
+            if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'saml') || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
                 return
             }
             println '\nConfiguring Banner Spring Security CAS ...'
@@ -205,7 +205,7 @@ Brief summary/description of the plugin.
         /*if (!conf || !conf.cas.active) {
             return
         }*/
-        if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
+        if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'saml') || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
             return
         }
         def providerNames = []
