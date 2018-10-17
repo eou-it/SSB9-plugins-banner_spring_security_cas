@@ -29,15 +29,7 @@ class BannerSpringSecurityCasGrailsPlugin extends Plugin {
             springSecurityCas:'3.1.0'
     ]
 
-   // List loadAfter = ['bannerCore','springSecurityCas']
-
     List loadAfter = ['bannerCore','bannerGeneralUtility','springSecuritySaml','springSecurityCas']
-    // List LoadBefore = ['springSecurityCore']
-   /* def dependsOn = [
-            bannerCore: '9.28.1 => *',
-
-            springSecuritySaml: '3.3.0 => *'
-    ]*/
 
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.3.2 > *"
@@ -151,10 +143,6 @@ Brief summary/description of the plugin.
         println "\n AuthenticationProvider = " + Holders.config.banner.sso.authenticationProvider
         println "*****************************************  **********************************************************\n"
 
-           /* if (!conf || !conf.cas.active) {
-                return
-            }*/
-
             if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'saml') || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
                 return
             }
@@ -165,7 +153,7 @@ Brief summary/description of the plugin.
             }
 
             bannerCasAuthenticationFailureHandler(BannerCasAuthenticationFailureHandler){
-                defaultFailureUrl = conf.failureHandler.defaultFailureUrl
+                defaultFailureUrl = Holders.config.banner?.sso?.grails?.plugin?.springsecurity?.failureHandler.defaultFailureUrl
             }
 
             casAuthenticationFilter(CasAuthenticationFilter){
@@ -202,9 +190,6 @@ Brief summary/description of the plugin.
         println "\n AuthenticationProvider = " + Holders.config.banner.sso.authenticationProvider
         println "*****************************************  **********************************************************"
         println "--------- In Banner CAS doWithApplicationContext End ---------------- \n"
-        /*if (!conf || !conf.cas.active) {
-            return
-        }*/
         if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'saml') || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
             return
         }
