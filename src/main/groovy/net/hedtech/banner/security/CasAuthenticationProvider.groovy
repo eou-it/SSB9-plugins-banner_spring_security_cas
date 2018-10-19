@@ -4,13 +4,10 @@
 package net.hedtech.banner.security
 
 import grails.util.Holders  as CH
-import grails.web.context.ServletContextHolder
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j
 import net.hedtech.banner.exceptions.AuthorizationException
-import org.grails.web.util.GrailsApplicationAttributes
 import org.jasig.cas.client.util.AbstractCasFilter
-import org.springframework.context.ApplicationContext
 import org.springframework.security.authentication.*
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -33,9 +30,7 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
     public boolean isNotExcludedFromSSO() {
         def theUrl = RCH.currentRequestAttributes().request.forwardURI
         def excludedUrlPattern = ''
-        excludedUrlPattern = CH.config.banner.sso.excludedUrlPattern?.toString() ?:'' // e.g., 'guest'
-        println "theUrl = ${theUrl}"
-        println "excludedUrlPattern = ${excludedUrlPattern}"
+        excludedUrlPattern = CH.config.banner.sso.excludedUrlPattern?.toString() ?: "[:]" // e.g., 'guest'
         !("$theUrl"?.contains( excludedUrlPattern ))
     }
 
@@ -76,7 +71,8 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             BannerAuthenticationToken bannerAuthenticationToken = AuthenticationProviderUtility.createAuthenticationToken(dbUser,dataSource, this)
             log.debug "CasAuthenticationProvider.casAuthentication BannerAuthenticationToken updated with claims $bannerAuthenticationToken"
 
-            def applicationContext = (ApplicationContext) ServletContextHolder.getServletContext().getAttribute( GrailsApplicationAttributes.APPLICATION_CONTEXT )
+            //def applicationContext = (ApplicationContext) ServletContextHolder.getServletContext().getAttribute( GrailsApplicationAttributes.APPLICATION_CONTEXT )
+            def applicationContext = CH?.applicationContext
             applicationContext.publishEvent( new BannerAuthenticationEvent( dbUser.name, true, '', '', new Date(), '' ) )
 
             bannerAuthenticationToken
