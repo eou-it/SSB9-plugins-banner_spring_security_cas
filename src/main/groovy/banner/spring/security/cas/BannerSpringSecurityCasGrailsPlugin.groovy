@@ -64,67 +64,6 @@ Brief summary/description of the plugin.
     // Online location of the plugin's browseable source code.
 //    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
 
-//TODO ADD ALTERNATIVE FOR doWithWebDescriptor as this method is removed now
-    /* def doWithWebDescriptor = { xml ->
-
-         def conf = SpringSecurityUtils.securityConfig
-         if (!conf || !conf.cas.active) {
-             return
-         }
-
-         // add the filter right after the last context-param
-             def contextParam = xml.'context-param'
-             contextParam[contextParam.size() - 1] + {
-                 'filter' {
-                 'filter-name'('CAS Validation Filter')
-                 'filter-class'(BannerSaml11ValidationFilter.name)
-                 'init-param' {
-                     'param-name'('casServerUrlPrefix')
-                     'param-value'(conf.cas.serverUrlPrefix)
-                 }
-                 'init-param' {
-                     'param-name'('serverName')
-                     'param-value'(conf.cas.serverName)
-                 }
-                 'init-param' {
-                     'param-name'('redirectAfterValidation')
-                     'param-value'('true')
-                 }
-                 'init-param' {
-                     'param-name'('artifactParameterName')
-                     'param-value'(conf.cas.artifactParameter)
-                 }
-                 'init-param' {
-                     'param-name'('tolerance')
-                     'param-value'(conf.cas.tolerance)
-                 }
-             }
-             'filter' {
-                 'filter-name'('CAS HttpServletRequest Wrapper Filter')
-                 'filter-class'(HttpServletRequestWrapperFilter.name)
-                 }
-             }
-
-         // add the filter-mapping right after the last filter
-         def mappingLocation = xml.'filter'
-         mappingLocation[mappingLocation.size() - 1] + {
-             'filter-mapping' {
-                 'filter-name'('CAS Validation Filter')
-                 'url-pattern'('/*')
-             }
-                 'filter-mapping' {
-                 'filter-name'('CAS HttpServletRequest Wrapper Filter')
-                     'url-pattern'('/*')
-                 }
-             }
-
-         def filterMapping = xml.'filter-mapping'
-         filterMapping[filterMapping.size() - 1] + {
-             'listener' {
-                 'listener-class'(SingleSignOutHttpSessionListener.name)
-     }
-         }
-     } */
 
 
     Closure doWithSpring() { {->
@@ -135,7 +74,7 @@ Brief summary/description of the plugin.
         def config = application.config
         println "********************************** In banner cas conf ********************************************"
 
-        if (!conf || !conf.cas.active) {
+        if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'saml') || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
             return
         }
         println '\nConfiguring Banner Spring Security CAS ...'
@@ -172,23 +111,6 @@ Brief summary/description of the plugin.
             initParameters = ["casServerUrlPrefix":conf.cas.serverUrlPrefix, "serverName":conf.cas.serverName, "renew":false,"artifactParameterName":conf.cas.artifactParameter, "redirectAfterValidation":true,"ignoreInitConfiguration":true, "tolerance":75000]
         }
 
-
-
-        /*  characterEncodingFilter(CharacterEncodingFilter){
-              encoding='utf-8'
-              urlPatterns = ['/*']
-          }*/
-
-        /* bannerSaml11ValidationFilter(BannerSaml11ValidationFilter){
-         }
-
-        bannerSaml11ValidationFilterRegistrationBean(FilterRegistrationBean) {
-             name = 'CAS Validation Filter'
-             filter = ref('bannerSaml11ValidationFilter')
-             urlPatterns = ['/*']
-             initParameters = ["casServerUrlPrefix":conf.cas.serverUrlPrefix, "serverName":conf.cas.serverName, "renew":true]
-         }*/
-
         httpServletRequestWrapperFilter(HttpServletRequestWrapperFilter){
         }
 
@@ -215,7 +137,7 @@ Brief summary/description of the plugin.
         println "********************************** In Banner CAS conf ********************************************"
         println "*****************************************  **********************************************************"
         println "--------- In Banner CAS doWithApplicationContext End ---------------- \n"
-        if (!conf || !conf.cas.active) {
+        if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'saml') || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
             return
         }
         def providerNames = []
@@ -261,26 +183,6 @@ Brief summary/description of the plugin.
         applicationContext.springSecurityFilterChain.filterChains = chains
         def filterChain = applicationContext.getBean('springSecurityFilterChain')
         println ("filterChain  ===== ${filterChain }")
-
-
-        //filterChains[2]
-
-        //registration.setOrder(1);
-
-
-//        httpServletRequestWrapperFilter(HttpServletRequestWrapperFilter)
-
-        /*  println ("\n ************** IN CAS ************************ \n")
-
-          bannerSaml11ValidationFilter(BannerSaml11ValidationFilter){
-          }
-          println "conf.cas.tolerance ${conf.cas.tolerance}"
-          bannerSaml11ValidationFilterRegistrationBean(FilterRegistrationBean) {
-              name = 'CAS Validation Filter'
-              filter = ref('bannerSaml11ValidationFilter')
-              urlPatterns = ['/*']
-              initParameters = ["casServerUrlPrefix":conf.cas.serverUrlPrefix, "artifactParameterName":conf.cas.artifactParameter, "serverName":conf.cas.serverName, "renew":true, "serverUrlEncoding":"UTF-8"]
-          }*/
 
     }
 
