@@ -1,24 +1,17 @@
 /* *****************************************************************************
- Copyright 2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2015-2018 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 
 package net.hedtech.jasig.cas.client
 
 import groovy.util.logging.Slf4j
-import org.apache.catalina.core.ApplicationFilterConfig
-import org.apache.tomcat.util.descriptor.web.FilterDef
 import org.jasig.cas.client.Protocol
 import org.jasig.cas.client.configuration.ConfigurationKeys
-import org.jasig.cas.client.ssl.HttpURLConnectionFactory
-import org.jasig.cas.client.ssl.HttpsURLConnectionFactory
 import org.jasig.cas.client.validation.AbstractTicketValidationFilter
 import org.jasig.cas.client.validation.Saml11TicketValidator
 import org.jasig.cas.client.validation.TicketValidator
-import org.springframework.security.authentication.AuthenticationManager
-
 import javax.servlet.FilterConfig
-import javax.servlet.ServletException
-import java.lang.reflect.Method
+
 
 /**
  * Saml11ValidationFilter of CAS client 3.1.8 does give an option to customise
@@ -37,15 +30,18 @@ import java.lang.reflect.Method
  */
 @Slf4j
 class BannerSaml11ValidationFilter extends AbstractTicketValidationFilter {
-        public BannerSaml11ValidationFilter() {
+    public BannerSaml11ValidationFilter() {
         super(Protocol.SAML11)
     }
 
-    protected final TicketValidator getTicketValidator(FilterConfig filterConfig) {
-        Saml11TicketValidator validator = new Saml11TicketValidator(filterConfig.getInitParameter("casServerUrlPrefix"))
+
+    protected final TicketValidator getTicketValidator(final FilterConfig filterConfig) {
+        final BannerSaml11CustomValidator validator = new BannerSaml11CustomValidator(getString(ConfigurationKeys.CAS_SERVER_URL_PREFIX))
+        final long tolerance = getLong(ConfigurationKeys.TOLERANCE)
+        validator.setTolerance(tolerance)
         validator.setRenew(true)
-        //validator.setRenew(getBoolean(filterConfig.getInitParameter("renew")))
-        return validator;
+        validator.setEncoding(getString(ConfigurationKeys.ENCODING))
+        return validator
     }
 }
 

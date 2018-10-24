@@ -30,7 +30,7 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
     public boolean isNotExcludedFromSSO() {
         def theUrl = RCH.currentRequestAttributes().request.forwardURI
         def excludedUrlPattern = ''
-        excludedUrlPattern = CH.config.banner.sso.excludedUrlPattern?.toString() ?: "[:]" // e.g., 'guest'
+        excludedUrlPattern = CH.config.banner.sso.excludedUrlPattern?.toString() ?:'[:]' // e.g., 'guest'
         !("$theUrl"?.contains( excludedUrlPattern ))
     }
 
@@ -41,9 +41,6 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
     }
 
     public Authentication authenticate( Authentication authentication ) {
-        log.trace "CasAuthenticationProvider.authenticate invoked for ${authentication.name}"
-        println "----------------------------------"
-        println "CasAuthenticationProvider.authenticate invoked for ${authentication.name}"
 
         def conn
         try {
@@ -71,7 +68,6 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             BannerAuthenticationToken bannerAuthenticationToken = AuthenticationProviderUtility.createAuthenticationToken(dbUser,dataSource, this)
             log.debug "CasAuthenticationProvider.casAuthentication BannerAuthenticationToken updated with claims $bannerAuthenticationToken"
 
-            //def applicationContext = (ApplicationContext) ServletContextHolder.getServletContext().getAttribute( GrailsApplicationAttributes.APPLICATION_CONTEXT )
             def applicationContext = CH?.applicationContext
             applicationContext.publishEvent( new BannerAuthenticationEvent( dbUser.name, true, '', '', new Date(), '' ) )
 

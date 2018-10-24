@@ -101,7 +101,7 @@ class UrlMappings {
         }
 
         "/"(view:"/index") {
-            println "this is the map worked..."
+
         }
 
         "/index.gsp" (view:"/index")
