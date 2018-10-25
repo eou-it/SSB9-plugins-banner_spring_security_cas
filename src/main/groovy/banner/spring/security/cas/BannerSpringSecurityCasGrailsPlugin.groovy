@@ -54,7 +54,6 @@ Brief summary/description of the plugin.
     def documentation = "http://grails.org/plugin/banner-spring-security-cas"
 
     Closure doWithSpring() { {->
-        println "--------- In Banner CAS doWithSpring ----------------"
         // TODO Implement runtime spring config (optional)
         def conf = SpringSecurityUtils.securityConfig
         def application = grailsApplication

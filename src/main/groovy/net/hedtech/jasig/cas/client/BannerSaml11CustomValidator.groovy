@@ -1,5 +1,9 @@
+/* *****************************************************************************
+ Copyright 2018 Ellucian Company L.P. and its affiliates.
+ ****************************************************************************** */
 package net.hedtech.jasig.cas.client
 
+import groovy.util.logging.Slf4j
 import org.jasig.cas.client.authentication.AttributePrincipal
 import org.jasig.cas.client.authentication.AttributePrincipalImpl
 import org.jasig.cas.client.util.CommonUtils
@@ -30,9 +34,9 @@ import org.w3c.dom.Element
 
 import javax.xml.validation.Schema
 import java.nio.charset.Charset
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
+
+@Slf4j
 public final class BannerSaml11CustomValidator extends AbstractUrlBasedTicketValidator {
     private long tolerance = 75000L;
     private final BasicParserPool basicParserPool = new BasicParserPool()
@@ -207,7 +211,7 @@ public final class BannerSaml11CustomValidator extends AbstractUrlBasedTicketVal
                 SamlUtils.formatForUtcTime(new Date())
                 );
 */
-        println "MESSAGE_TO_SEND =============== $MESSAGE_TO_SEND"
+        this.logger.debug("MESSAGE_TO_SEND =============== $MESSAGE_TO_SEND")
         HttpURLConnection conn = null;
         DataOutputStream out = null;
         BufferedReader in1 = null;

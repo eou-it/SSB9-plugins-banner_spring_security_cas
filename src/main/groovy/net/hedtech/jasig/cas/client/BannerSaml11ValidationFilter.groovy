@@ -4,11 +4,9 @@
 
 package net.hedtech.jasig.cas.client
 
-import groovy.util.logging.Slf4j
 import org.jasig.cas.client.Protocol
 import org.jasig.cas.client.configuration.ConfigurationKeys
 import org.jasig.cas.client.validation.AbstractTicketValidationFilter
-import org.jasig.cas.client.validation.Saml11TicketValidator
 import org.jasig.cas.client.validation.TicketValidator
 import javax.servlet.FilterConfig
 
@@ -28,12 +26,11 @@ import javax.servlet.FilterConfig
  * filter bean. This class is made for that. To allow fall back mechanism if a old CAS
  * server is being used which cannot support SAML 1.1 compliance.
  */
-@Slf4j
+
 class BannerSaml11ValidationFilter extends AbstractTicketValidationFilter {
     public BannerSaml11ValidationFilter() {
         super(Protocol.SAML11)
     }
-
 
     protected final TicketValidator getTicketValidator(final FilterConfig filterConfig) {
         final BannerSaml11CustomValidator validator = new BannerSaml11CustomValidator(getString(ConfigurationKeys.CAS_SERVER_URL_PREFIX))
