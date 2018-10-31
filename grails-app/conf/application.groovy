@@ -75,11 +75,6 @@ grails.enable.native2ascii = false
 // enable GSP preprocessing: replace head -> g:captureHead, title -> g:captureTitle, meta -> g:captureMeta, body -> g:captureBody
 grails.views.gsp.sitemesh.preprocess = true
 
-grails.resources.mappers.yuicssminify.includes = ['**/*.css']
-grails.resources.mappers.yuijsminify.includes  = ['**/*.js']
-grails.resources.mappers.yuicssminify.excludes = ['**/*.min.css']
-grails.resources.mappers.yuijsminify.excludes  = ['**/*.min.js']
-
 environments {
     development {
         grails.resources.debug = true
@@ -138,7 +133,7 @@ grails {
                 key = 'grails-spring-security-cas'
                 artifactParameter = 'ticket'
                 serviceParameter = 'service'
-                filterProcessesUrl = '/j_spring_cas_security_check'
+                filterProcessesUrl = '/login/cas'
                 serverUrlEncoding = 'UTF-8'
             }
             logout {
@@ -146,7 +141,6 @@ grails {
                 mepErrorLogoutUrl='/logout/logoutPage'
             }
             useRequestMapDomainClass = false
-            //TODO Commenting the imports and corresponding changes as imports in not supported here
         }
     }
 }

@@ -1,14 +1,15 @@
 /* *****************************************************************************
- Copyright 2015 Ellucian Company L.P. and its affiliates.
+ Copyright 2015-2018 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 
 package net.hedtech.jasig.cas.client
 
+import org.jasig.cas.client.Protocol
+import org.jasig.cas.client.configuration.ConfigurationKeys
 import org.jasig.cas.client.validation.AbstractTicketValidationFilter
-import org.jasig.cas.client.validation.Saml11TicketValidator
 import org.jasig.cas.client.validation.TicketValidator
-
 import javax.servlet.FilterConfig
+
 
 /**
  * Saml11ValidationFilter of CAS client 3.1.8 does give an option to customise
@@ -25,16 +26,20 @@ import javax.servlet.FilterConfig
  * filter bean. This class is made for that. To allow fall back mechanism if a old CAS
  * server is being used which cannot support SAML 1.1 compliance.
  */
+
 class BannerSaml11ValidationFilter extends AbstractTicketValidationFilter {
     public BannerSaml11ValidationFilter() {
-        this.setArtifactParameterName("SAMLart");
-        this.setServiceParameterName("TARGET");
+        super(Protocol.SAML11)
     }
 
-    protected final TicketValidator getTicketValidator(FilterConfig filterConfig) {
-        Saml11TicketValidator validator = new Saml11TicketValidator(this.getPropertyFromInitParams(filterConfig, "casServerUrlPrefix", (String)null));
-        validator.setRenew(this.parseBoolean(this.getPropertyFromInitParams(filterConfig, "renew", "false")));
-        return validator;
+    protected final TicketValidator getTicketValidator(final FilterConfig filterConfig) {
+        final BannerSaml11CustomValidator validator = new BannerSaml11CustomValidator(getString(ConfigurationKeys.CAS_SERVER_URL_PREFIX))
+        final long tolerance = getLong(ConfigurationKeys.TOLERANCE)
+        validator.setTolerance(tolerance)
+        validator.setRenew(true)
+        validator.setEncoding(getString(ConfigurationKeys.ENCODING))
+        return validator
     }
 }
+
 
