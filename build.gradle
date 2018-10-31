@@ -9,7 +9,7 @@ buildscript {
     }
 }
 
-version "0.1"
+version "9.30"
 group "banner.spring.security.cas"
 
 apply plugin:"eclipse"

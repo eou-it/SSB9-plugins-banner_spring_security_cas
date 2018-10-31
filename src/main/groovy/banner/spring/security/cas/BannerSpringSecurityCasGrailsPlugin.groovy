@@ -1,22 +1,15 @@
 package banner.spring.security.cas
 
-import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.web.GrailsSecurityFilterChain
-import grails.plugin.springsecurity.web.filter.GrailsAnonymousAuthenticationFilter
 import grails.plugins.Plugin
 import grails.util.Holders
-import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
 import net.hedtech.banner.controllers.ControllerUtils
 import net.hedtech.banner.security.CasAuthenticationProvider
 import net.hedtech.jasig.cas.client.BannerSaml11ValidationFilter
 import org.jasig.cas.client.util.HttpServletRequestWrapperFilter
-import org.jasig.cas.client.validation.Saml11TicketValidationFilter
-import org.jasig.cas.client.validation.Saml11TicketValidator
 import org.springframework.boot.web.servlet.FilterRegistrationBean
-import grails.core.GrailsApplication
-
 import net.hedtech.banner.security.BannerCasAuthenticationFailureHandler
 import org.springframework.security.cas.web.CasAuthenticationFilter
 
@@ -29,16 +22,15 @@ class BannerSpringSecurityCasGrailsPlugin extends Plugin {
     String version = '9.30'
     def dependsOn = [
             bannerCore: '9.28.1 => *',
+            bannerGeneralUtility:'9.28.1 => *',
             springSecurityCas:'3.1.0'
     ]
 
-    List loadAfter = ['bannerCore','springSecurityCas']
-
-    // the version or versions of Grails the plugin is designed for
+    List loadAfter = ['bannerCore','bannerGeneralUtility','springSecuritySaml','springSecurityCas']
     def grailsVersion = "3.3.2 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-            "grails-app/views/error.gsp"
+        "grails-app/views/error.gsp"
     ]
 
     // TODO Fill in these fields
@@ -79,7 +71,7 @@ Brief summary/description of the plugin.
             authenticationDetailsSource = ref('authenticationDetailsSource')
             serviceProperties = ref('casServiceProperties')
             proxyGrantingTicketStorage = ref('casProxyGrantingTicketStorage')
-            filterProcessesUrl = conf.cas.filterProcessesUrl // '/j_spring_cas_security_check'
+            filterProcessesUrl = conf.cas.filterProcessesUrl // '/cas/login'
             continueChainBeforeSuccessfulAuthentication = conf.apf.continueChainBeforeSuccessfulAuthentication // false
             allowSessionCreation = conf.apf.allowSessionCreation // true
             proxyReceptorUrl = conf.cas.proxyReceptorUrl
@@ -153,9 +145,7 @@ Brief summary/description of the plugin.
             List<Filter> filters = value.toString().split(',').collect { String name -> applicationContext.getBean(name, Filter) }
             chains << new GrailsSecurityFilterChain(entry.pattern as String, filters)
         }
-
         applicationContext.springSecurityFilterChain.filterChains = chains
-        def filterChain = applicationContext.getBean('springSecurityFilterChain')
     }
 
     private def isSsbEnabled() {
@@ -166,8 +156,6 @@ Brief summary/description of the plugin.
 
     void onChange(Map<String, Object> event) {
         // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
     }
 
     void onConfigChange(Map<String, Object> event) {
