@@ -36,7 +36,7 @@ class BannerSaml11ValidationFilter extends AbstractTicketValidationFilter {
         final BannerSaml11CustomValidator validator = new BannerSaml11CustomValidator(getString(ConfigurationKeys.CAS_SERVER_URL_PREFIX))
         final long tolerance = getLong(ConfigurationKeys.TOLERANCE)
         validator.setTolerance(tolerance)
-        validator.setRenew(true)
+        validator.setRenew(false)
         validator.setEncoding(getString(ConfigurationKeys.ENCODING))
         return validator
     }

@@ -1,3 +1,6 @@
+/* *****************************************************************************
+ Copyright 2015-2018 Ellucian Company L.P. and its affiliates.
+ ****************************************************************************** */
 package banner.spring.security.cas
 
 import grails.plugin.springsecurity.SpringSecurityUtils
@@ -8,9 +11,13 @@ import groovy.util.logging.Slf4j
 import net.hedtech.banner.controllers.ControllerUtils
 import net.hedtech.banner.security.CasAuthenticationProvider
 import net.hedtech.jasig.cas.client.BannerSaml11ValidationFilter
+import org.jasig.cas.client.session.SingleSignOutFilter
+import org.jasig.cas.client.session.SingleSignOutHttpSessionListener
 import org.jasig.cas.client.util.HttpServletRequestWrapperFilter
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import net.hedtech.banner.security.BannerCasAuthenticationFailureHandler
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean
+import org.springframework.core.Ordered
 import org.springframework.security.cas.web.CasAuthenticationFilter
 
 import javax.servlet.Filter
@@ -20,12 +27,12 @@ class BannerSpringSecurityCasGrailsPlugin extends Plugin {
     String groupId = "net.hedtech"
 
     def dependsOn = [
-            bannerCore: '9.28.1 => *',
-            bannerGeneralUtility:'9.28.1 => *',
+            bannerCore: '9.30 => *',
+            bannerGeneralUtility:'9.30 => *',
             springSecurityCas:'3.1.0'
     ]
 
-    List loadAfter = ['bannerCore','bannerGeneralUtility','springSecuritySaml','springSecurityCas']
+    List loadAfter = ['bannerCore','bannerGeneralUtility','springSecurityCas']
     def grailsVersion = "3.3.2 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
@@ -34,12 +41,9 @@ class BannerSpringSecurityCasGrailsPlugin extends Plugin {
 
     // TODO Fill in these fields
     def title = "Banner Spring Security Cas" // Headline display name of the plugin
-    def author = "Your name"
-    def authorEmail = ""
     def description = '''\
 Brief summary/description of the plugin.
 '''
-    def profiles = ['web']
 
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/banner-spring-security-cas"
@@ -47,7 +51,6 @@ Brief summary/description of the plugin.
     Closure doWithSpring() { {->
         // TODO Implement runtime spring config (optional)
         def conf = SpringSecurityUtils.securityConfig
-        def application = grailsApplication
         if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'saml') || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
             return
         }
@@ -77,7 +80,6 @@ Brief summary/description of the plugin.
         }
 
 
-
         httpServletRequestWrapperFilter(HttpServletRequestWrapperFilter)
         httpServletRequestWrapperFilterRegistrationBean(FilterRegistrationBean){
             name = 'CAS HttpServletRequest Wrapper Filter'
@@ -93,8 +95,21 @@ Brief summary/description of the plugin.
             name = 'CAS Validation Filter'
             filter = ref('bannerSaml11ValidationFilter')
             urlPatterns = ['/*']
-            initParameters = ["casServerUrlPrefix":conf.cas.serverUrlPrefix, "serverName":conf.cas.serverName, "renew":conf.cas.sendRenew]
+            initParameters = ["casServerUrlPrefix":conf.cas.serverUrlPrefix, "serverName":conf.cas.serverName]
         }
+
+        singleSignOutFilter(SingleSignOutFilter) {
+            ignoreInitConfiguration = true
+            casServerUrlPrefix = conf.cas.serverUrlPrefix
+        }
+
+        singleSignOutFilterRegistrationBean(FilterRegistrationBean) {
+            name = 'CAS Single Sign Out Filter'
+            filter = ref('singleSignOutFilter')
+            order = Ordered.HIGHEST_PRECEDENCE
+        }
+        singleSignOutHttpSessionListener(ServletListenerRegistrationBean, new SingleSignOutHttpSessionListener())
+
         println '... finished configuring Banner Spring Security CAS\n'
     }
     }
@@ -105,18 +120,13 @@ Brief summary/description of the plugin.
 
     void doWithApplicationContext() {
         def conf = SpringSecurityUtils.securityConfig
-        // TODO Implement post initialization spring config (optional)
-        // build providers list here to give dependent plugins a chance to register some
         if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'saml') || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
             return
         }
         def providerNames = []
-
-
         if (conf.providerNames) {
             providerNames.addAll conf.providerNames
         } else {
-            //TODO After adding Banner_Core Dependency uncomment below lines.
             if(ControllerUtils.isGuestAuthenticationEnabled()){
                 providerNames = ['casBannerAuthenticationProvider','selfServiceBannerAuthenticationProvider','bannerAuthenticationProvider']
             } else{
@@ -145,10 +155,6 @@ Brief summary/description of the plugin.
             chains << new GrailsSecurityFilterChain(entry.pattern as String, filters)
         }
         applicationContext.springSecurityFilterChain.filterChains = chains
-    }
-
-    private def isSsbEnabled() {
-        Holders.config.ssbEnabled instanceof Boolean ? Holders.config.ssbEnabled : false
     }
 
     private createBeanList(names, ctx) { names.collect { name -> ctx.getBean(name) } }
