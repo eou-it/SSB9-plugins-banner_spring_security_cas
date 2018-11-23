@@ -110,41 +110,6 @@ formControllerMap = [
         '/':['GUAGMNU','SELFSERVICE']
 ]
 
-banner {
-    sso {
-        authenticationProvider = 'cas'
-        authenticationAssertionAttribute = 'UDC_IDENTIFIER'
-    }
-}
-
-grails {
-    plugin {
-        springsecurity {
-            cas {
-                active = true
-                serverUrlPrefix = 'https://e004060.ellucian.com:8943/cas'
-                serviceUrl = 'http://localhost:8090/banner-third-party-authenticator/j_spring_cas_security_check'
-                serverName = 'http://localhost:8090'
-                proxyCallbackUrl = 'http://localhost:8090/banner-third-party-authenticator/secure/receptor'
-                loginUri = '/login'
-                sendRenew = false
-                proxyReceptorUrl = '/secure/receptor'
-                useSingleSignout = true
-                key = 'grails-spring-security-cas'
-                artifactParameter = 'ticket'
-                serviceParameter = 'service'
-                filterProcessesUrl = '/login/cas'
-                serverUrlEncoding = 'UTF-8'
-            }
-            logout {
-                afterLogoutUrl = "/"
-                mepErrorLogoutUrl='/logout/logoutPage'
-            }
-            useRequestMapDomainClass = false
-        }
-    }
-}
-
 // CodeNarc rulesets
 codenarc.ruleSetFiles="rulesets/banner.groovy"
 codenarc.reportName="target/CodeNarcReport.html"
@@ -171,4 +136,3 @@ cache.region.factory_class = 'org.hibernate.cache.SingletonEhCacheRegionFactory'
 //    cache.region.factory_class = 'org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory' // Hibernate 4
 singleSession = true // configure OSIV singleSession mode
 flush.mode = 'manual' // OSIV session flush mode outside of transactional context
-
