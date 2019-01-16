@@ -2,28 +2,6 @@
  Copyright 2009-2018 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 
-//TODO Commenting the imports and corresponding changes as imports in not supported here
-//import net.hedtech.banner.configuration.ApplicationConfigurationUtils as ConfigFinder
-//import grails.plugin.springsecurity.SecurityConfigType
-
-// ******************************************************************************
-//
-//                       +++ EXTERNALIZED CONFIGURATION +++
-//
-// ******************************************************************************
-
-grails.config.locations = [] // leave this initialized to an empty list, and add your locations in the map below.
-
-//TODO Commenting the imports and corresponding changes as imports in not supported here
-/*def locationAdder = ConfigFinder.&addLocation.curry(grails.config.locations)
-println "App Name ${appName}"
-[ BANNER_APP_CONFIG:        "banner_configuration.groovy",
-//  BANNER_CORE_TESTAPP_CONFIG: "banner_core_testapp_configuration.groovy",
-].each { envName, defaultFileName -> locationAdder( envName, defaultFileName ) }*/
-
-grails.config.locations.each {
-    println "configuration: " + it
-}
 
 // ******************************************************************************
 // ****** SSB specific db related flags
@@ -64,7 +42,6 @@ grails.views.gsp.encoding = "UTF-8"
 grails.converters.encoding = "UTF-8"
 
 grails.converters.domain.include.version = true
-//grails.converters.json.date = "default"
 
 grails.converters.json.pretty.print = true
 grails.converters.json.default.deep = true
@@ -74,12 +51,6 @@ grails.enable.native2ascii = false
 
 // enable GSP preprocessing: replace head -> g:captureHead, title -> g:captureTitle, meta -> g:captureMeta, body -> g:captureBody
 grails.views.gsp.sitemesh.preprocess = true
-
-environments {
-    development {
-        grails.resources.debug = true
-    }
-}
 
 
 // ******************************************************************************
@@ -110,12 +81,6 @@ formControllerMap = [
         '/':['GUAGMNU','SELFSERVICE']
 ]
 
-// CodeNarc rulesets
-codenarc.ruleSetFiles="rulesets/banner.groovy"
-codenarc.reportName="target/CodeNarcReport.html"
-codenarc.propertiesFile="grails-app/conf/codenarc.properties"
-codenarc.extraIncludeDirs=["grails-app/composers"]
-
 grails.validateable.packages=['net.hedtech.banner.student.registration']
 
 // local seeddata files
@@ -124,11 +89,6 @@ seedDataTarget = [ ]
 markdown = [
         removeHtml: true
 ]
-
-String loggingFileDir =  "target/logs"
-String logAppName = "banner-third-party-authenticator"
-String loggingFileName = "${loggingFileDir}/${logAppName}.log".toString()
-def environment = grails.util.Environment.current
 
 cache.use_second_level_cache = true
 cache.use_query_cache = false
