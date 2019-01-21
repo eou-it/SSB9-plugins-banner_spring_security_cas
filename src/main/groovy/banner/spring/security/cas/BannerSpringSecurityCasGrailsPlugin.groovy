@@ -60,8 +60,13 @@ Brief summary/description of the plugin.
             dataSource = ref(dataSource)
         }
 
+        def failureHandlerUrl = Holders.config.banner?.sso?.grails?.plugin?.springsecurity?.failureHandler?.defaultFailureUrl
+        if(failureHandlerUrl == new TreeMap()){
+            failureHandlerUrl = Holders.config.grails?.plugin?.springsecurity?.failureHandler?.defaultFailureUrl
+        }
+
         bannerCasAuthenticationFailureHandler(BannerCasAuthenticationFailureHandler){
-            defaultFailureUrl = Holders.config.banner?.sso?.grails?.plugin?.springsecurity?.failureHandler.defaultFailureUrl
+            defaultFailureUrl = failureHandlerUrl
         }
 
         casAuthenticationFilter(CasAuthenticationFilter){
