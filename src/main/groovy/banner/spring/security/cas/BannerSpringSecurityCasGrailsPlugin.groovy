@@ -56,17 +56,12 @@ Brief summary/description of the plugin.
         }
         println '\nConfiguring Banner Spring Security CAS ...'
 
-            casBannerAuthenticationProvider(CasAuthenticationProvider) {
+        casBannerAuthenticationProvider(CasAuthenticationProvider) {
             dataSource = ref(dataSource)
         }
 
-        def failureHandlerUrl = Holders.config.banner?.sso?.grails?.plugin?.springsecurity?.failureHandler?.defaultFailureUrl
-        if(failureHandlerUrl == new TreeMap()){
-            failureHandlerUrl = Holders.config.grails?.plugin?.springsecurity?.failureHandler?.defaultFailureUrl
-        }
-
         bannerCasAuthenticationFailureHandler(BannerCasAuthenticationFailureHandler){
-            defaultFailureUrl = failureHandlerUrl
+            defaultFailureUrl = Holders.config.grails?.plugin?.springsecurity?.failureHandler?.defaultFailureUrl
         }
 
         casAuthenticationFilter(CasAuthenticationFilter){
