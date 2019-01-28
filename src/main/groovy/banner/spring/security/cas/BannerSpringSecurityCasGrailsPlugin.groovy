@@ -49,7 +49,6 @@ Brief summary/description of the plugin.
     def documentation = "http://grails.org/plugin/banner-spring-security-cas"
 
     Closure doWithSpring() { {->
-        // TODO Implement runtime spring config (optional)
         def conf = SpringSecurityUtils.securityConfig
         if(Holders.config.banner?.sso?.authenticationProvider == 'default' || (Holders.config.banner?.sso?.authenticationProvider == 'saml') || (Holders.config.banner?.sso?.authenticationProvider == 'cas' && !conf.cas.active )){
             return
