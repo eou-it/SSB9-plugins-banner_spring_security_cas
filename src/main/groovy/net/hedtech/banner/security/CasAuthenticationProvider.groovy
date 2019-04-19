@@ -3,10 +3,12 @@
  *******************************************************************************/
 package net.hedtech.banner.security
 
+import grails.util.Holders
 import grails.util.Holders  as CH
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j
 import net.hedtech.banner.exceptions.AuthorizationException
+import net.hedtech.banner.general.audit.LoginAuditService
 import org.jasig.cas.client.util.AbstractCasFilter
 import org.springframework.security.authentication.*
 import org.springframework.security.core.Authentication
@@ -20,6 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder as RCH
 public class CasAuthenticationProvider implements AuthenticationProvider {
 
     def dataSource  // injected by Spring
+    def loginAuditService = new LoginAuditService()
 
     public boolean supports( Class clazz ) {
         log.trace "CasBannerAuthenticationProvider.supports( $clazz ) will return ${isCasEnabled()}"
@@ -60,6 +63,11 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
 
             def dbUser = AuthenticationProviderUtility.getMappedUserForUdcId(assertAttributeValue, dataSource)
             log.debug "CasAuthenticationProvider.casAuthentication found Oracle database user $dbUser for assertAttributeValue"
+
+            if(dbUser!= null && Holders.config.EnableLoginAudit == "Y"){
+                String loginComment = "Login successful."
+                loginAuditService.createLoginLogoutAudit(dbUser,loginComment)
+            }
 
             // Next, we'll verify the authenticationResults (and throw appropriate exceptions for expired pin, disabled account, etc.)
             AuthenticationProviderUtility.verifyAuthenticationResults this, authentication, dbUser
