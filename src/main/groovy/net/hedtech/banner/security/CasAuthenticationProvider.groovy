@@ -64,8 +64,8 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             log.debug "CasAuthenticationProvider.casAuthentication found Oracle database user $dbUser for assertAttributeValue"
 
             if(dbUser!= null && (Holders.config.EnableLoginAudit)?.equalsIgnoreCase('Y')){
-                String loginComment = "Login successful."
-                LoginAuditService loginAuditService
+                String loginComment = "Login successful"
+                LoginAuditService loginAuditService = null
                 if (!loginAuditService) {
                     loginAuditService = Holders.grailsApplication.mainContext.getBean("loginAuditService")
                 }
