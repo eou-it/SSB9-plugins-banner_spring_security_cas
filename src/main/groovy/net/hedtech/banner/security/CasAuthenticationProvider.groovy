@@ -22,7 +22,6 @@ import org.springframework.web.context.request.RequestContextHolder as RCH
 public class CasAuthenticationProvider implements AuthenticationProvider {
 
     def dataSource  // injected by Spring
-    def loginAuditService = new LoginAuditService()
 
     public boolean supports( Class clazz ) {
         log.trace "CasBannerAuthenticationProvider.supports( $clazz ) will return ${isCasEnabled()}"
@@ -64,8 +63,12 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             def dbUser = AuthenticationProviderUtility.getMappedUserForUdcId(assertAttributeValue, dataSource)
             log.debug "CasAuthenticationProvider.casAuthentication found Oracle database user $dbUser for assertAttributeValue"
 
-            if(dbUser!= null && Holders.config.EnableLoginAudit == "Y"){
+            if(dbUser!= null && (Holders.config.EnableLoginAudit)?.equalsIgnoreCase('Y')){
                 String loginComment = "Login successful."
+                LoginAuditService loginAuditService
+                if (!loginAuditService) {
+                    loginAuditService = Holders.grailsApplication.mainContext.getBean("loginAuditService")
+                }
                 loginAuditService.createLoginLogoutAudit(dbUser,loginComment)
             }
 
