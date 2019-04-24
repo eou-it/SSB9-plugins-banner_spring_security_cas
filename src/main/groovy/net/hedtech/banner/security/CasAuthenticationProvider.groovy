@@ -63,7 +63,10 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             def dbUser = AuthenticationProviderUtility.getMappedUserForUdcId(assertAttributeValue, dataSource)
             log.debug "CasAuthenticationProvider.casAuthentication found Oracle database user $dbUser for assertAttributeValue"
 
-            if(dbUser!= null && (Holders.config.EnableLoginAudit)?.equalsIgnoreCase('Y')){
+
+            String loginAuditConfiguration = AuthenticationProviderUtility.getLoginAuditConfiguration()
+
+            if(dbUser!= null && loginAuditConfiguration?.equalsIgnoreCase('Y')){
                 String loginComment = "Login successful"
                 LoginAuditService loginAuditService = null
                 if (!loginAuditService) {
