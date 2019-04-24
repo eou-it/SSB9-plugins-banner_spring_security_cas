@@ -3,10 +3,12 @@
  *******************************************************************************/
 package net.hedtech.banner.security
 
+import grails.util.Holders
 import grails.util.Holders  as CH
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j
 import net.hedtech.banner.exceptions.AuthorizationException
+import net.hedtech.banner.general.audit.LoginAuditService
 import org.jasig.cas.client.util.AbstractCasFilter
 import org.springframework.security.authentication.*
 import org.springframework.security.core.Authentication
@@ -60,6 +62,18 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
 
             def dbUser = AuthenticationProviderUtility.getMappedUserForUdcId(assertAttributeValue, dataSource)
             log.debug "CasAuthenticationProvider.casAuthentication found Oracle database user $dbUser for assertAttributeValue"
+
+
+            String loginAuditConfiguration = AuthenticationProviderUtility.getLoginAuditConfiguration()
+
+            if(dbUser!= null && loginAuditConfiguration?.equalsIgnoreCase('Y')){
+                String loginComment = "Login successful"
+                LoginAuditService loginAuditService = null
+                if (!loginAuditService) {
+                    loginAuditService = Holders.grailsApplication.mainContext.getBean("loginAuditService")
+                }
+                loginAuditService.createLoginLogoutAudit(dbUser,loginComment)
+            }
 
             // Next, we'll verify the authenticationResults (and throw appropriate exceptions for expired pin, disabled account, etc.)
             AuthenticationProviderUtility.verifyAuthenticationResults this, authentication, dbUser
