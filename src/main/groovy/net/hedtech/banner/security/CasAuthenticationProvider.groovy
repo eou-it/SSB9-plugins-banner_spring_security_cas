@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2009-2018 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.security
 
@@ -72,7 +72,7 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
                 if (!loginAuditService) {
                     loginAuditService = Holders.grailsApplication.mainContext.getBean("loginAuditService")
                 }
-                loginAuditService.createLoginLogoutAudit(dbUser,loginComment)
+                loginAuditService.createLoginLogoutAudit(dbUser?.name, dbUser?.pidm, loginComment)
             }
 
             // Next, we'll verify the authenticationResults (and throw appropriate exceptions for expired pin, disabled account, etc.)
