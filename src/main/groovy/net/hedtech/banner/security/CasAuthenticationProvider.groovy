@@ -21,7 +21,8 @@ import org.springframework.web.context.request.RequestContextHolder as RCH
 @Slf4j
 public class CasAuthenticationProvider implements AuthenticationProvider {
 
-    def dataSource  // injected by Spring
+    def dataSource
+    def loginAuditService
 
     public boolean supports( Class clazz ) {
         log.trace "CasBannerAuthenticationProvider.supports( $clazz ) will return ${isCasEnabled()}"
@@ -68,7 +69,6 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
 
             if(dbUser!= null && loginAuditConfiguration?.equalsIgnoreCase('Y')){
                 String loginComment = "Login successful"
-                LoginAuditService loginAuditService = null
                 if (!loginAuditService) {
                     loginAuditService = Holders.grailsApplication.mainContext.getBean("loginAuditService")
                 }
