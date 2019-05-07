@@ -26,3 +26,13 @@ SendFailures.txt
 .idea/**/*
 out/
 **-rtl.css
+**-rtl.css
+plugin.xml
+build/
+.gradle/**/*
+*.log
+*.iws
+*.ipr
+*.iml
+.idea
+gradle/wrapper/**
