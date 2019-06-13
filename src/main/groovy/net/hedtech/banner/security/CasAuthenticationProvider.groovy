@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2009-2018 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.security
 
@@ -21,7 +21,8 @@ import org.springframework.web.context.request.RequestContextHolder as RCH
 @Slf4j
 public class CasAuthenticationProvider implements AuthenticationProvider {
 
-    def dataSource  // injected by Spring
+    def dataSource
+    def loginAuditService
 
     public boolean supports( Class clazz ) {
         log.trace "CasBannerAuthenticationProvider.supports( $clazz ) will return ${isCasEnabled()}"
@@ -68,11 +69,10 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
 
             if(dbUser!= null && loginAuditConfiguration?.equalsIgnoreCase('Y')){
                 String loginComment = "Login successful"
-                LoginAuditService loginAuditService = null
                 if (!loginAuditService) {
                     loginAuditService = Holders.grailsApplication.mainContext.getBean("loginAuditService")
                 }
-                loginAuditService.createLoginLogoutAudit(dbUser,loginComment)
+                loginAuditService.createLoginLogoutAudit(dbUser?.name, dbUser?.pidm, loginComment)
             }
 
             // Next, we'll verify the authenticationResults (and throw appropriate exceptions for expired pin, disabled account, etc.)

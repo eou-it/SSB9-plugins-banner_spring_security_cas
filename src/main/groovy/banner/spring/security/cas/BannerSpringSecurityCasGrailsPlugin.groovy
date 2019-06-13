@@ -9,6 +9,7 @@ import grails.plugins.Plugin
 import grails.util.Holders
 import groovy.util.logging.Slf4j
 import net.hedtech.banner.controllers.ControllerUtils
+import net.hedtech.banner.general.audit.LoginAuditService
 import net.hedtech.banner.security.CasAuthenticationProvider
 import net.hedtech.jasig.cas.client.BannerSaml11ValidationFilter
 import org.jasig.cas.client.session.SingleSignOutFilter
@@ -55,8 +56,11 @@ Brief summary/description of the plugin.
         }
         println '\nConfiguring Banner Spring Security CAS ...'
 
+        loginAuditService(LoginAuditService)
+
         casBannerAuthenticationProvider(CasAuthenticationProvider) {
             dataSource = ref(dataSource)
+            loginAuditService = ref(loginAuditService)
         }
 
         bannerCasAuthenticationFailureHandler(BannerCasAuthenticationFailureHandler){
