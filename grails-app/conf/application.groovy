@@ -83,16 +83,34 @@ formControllerMap = [
 
 grails.validateable.packages=['net.hedtech.banner.student.registration']
 
-// local seeddata files
-seedDataTarget = [ ]
+dataSource {
+    dialect = "org.hibernate.dialect.Oracle10gDialect"
+    loggingSql = false
+}
 
-markdown = [
-        removeHtml: true
+
+hibernate {
+    cache.use_second_level_cache = true
+    cache.use_query_cache = true
+    cache.region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
+    //hbm2ddl.auto = null
+    show_sql = false
+    packagesToScan="net.hedtech.**.*"
+    flush.mode = AUTO
+    dialect = "org.hibernate.dialect.Oracle10gDialect"
+    config.location = [
+            "classpath:hibernate-banner-core.cfg.xml",
+            "classpath:hibernate-banner-core.testing.cfg.xml"
+    ]
+}
+
+environments {
+    test {
+        grails.plugin.springsecurity.cas.active = false
+    }
+}
+
+//Added for integration tests to run in plugin level
+grails.config.locations = [
+        BANNER_APP_CONFIG: "banner_configuration.groovy"
 ]
-
-cache.use_second_level_cache = true
-cache.use_query_cache = false
-cache.region.factory_class = 'org.hibernate.cache.SingletonEhCacheRegionFactory' // Hibernate 3
-//    cache.region.factory_class = 'org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory' // Hibernate 4
-singleSession = true // configure OSIV singleSession mode
-flush.mode = 'manual' // OSIV session flush mode outside of transactional context
