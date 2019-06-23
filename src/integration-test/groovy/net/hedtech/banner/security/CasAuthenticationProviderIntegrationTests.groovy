@@ -1,8 +1,10 @@
 /*******************************************************************************
- Copyright 2009-2017 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.security
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import grails.util.Holders
 import net.hedtech.banner.testing.BaseIntegrationTestCase
 import org.jasig.cas.client.authentication.AttributePrincipal
@@ -19,12 +21,15 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
+import static groovy.test.GroovyAssert.shouldFail
 
 import javax.servlet.http.HttpSession
 
 /**
  * Tests that the ValidPropertyConstraint is working as expected.
  */
+@Integration
+@Rollback
 class CasAuthenticationProviderIntegrationTests extends BaseIntegrationTestCase {
 
     def casAuthenticationProvider
