@@ -104,6 +104,7 @@ Brief summary/description of the plugin.
         singleSignOutFilter(SingleSignOutFilter) {
             ignoreInitConfiguration = true
             casServerUrlPrefix = conf.cas.serverUrlPrefix
+            artifactParameterName = conf.cas.artifactParameter
         }
 
         singleSignOutFilterRegistrationBean(FilterRegistrationBean) {
