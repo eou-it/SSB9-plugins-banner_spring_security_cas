@@ -1,5 +1,5 @@
 /* *****************************************************************************
- Copyright 2015-2018 Ellucian Company L.P. and its affiliates.
+ Copyright 2015-2020 Ellucian Company L.P. and its affiliates.
  ****************************************************************************** */
 package banner.spring.security.cas
 
@@ -20,6 +20,7 @@ import net.hedtech.banner.security.BannerCasAuthenticationFailureHandler
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean
 import org.springframework.core.Ordered
 import org.springframework.security.cas.web.CasAuthenticationFilter
+import org.springframework.web.filter.CharacterEncodingFilter
 
 import javax.servlet.Filter
 
@@ -82,13 +83,21 @@ Brief summary/description of the plugin.
             proxyReceptorUrl = conf.cas.proxyReceptorUrl
         }
 
+        characterEncodingFilter(CharacterEncodingFilter){
+            encoding = 'UTF-8'
+        }
+        characterEncodingFilterFilterRegistrationBean(FilterRegistrationBean){
+            name = 'Character Encoding Filter'
+            filter = ref('characterEncodingFilter')
+            order = Ordered.HIGHEST_PRECEDENCE
+            urlPatterns = ['/*']
+        }
 
         httpServletRequestWrapperFilter(HttpServletRequestWrapperFilter)
         httpServletRequestWrapperFilterRegistrationBean(FilterRegistrationBean){
             name = 'CAS HttpServletRequest Wrapper Filter'
             filter = ref('httpServletRequestWrapperFilter')
             urlPatterns = ['/*']
-
         }
 
         bannerSaml11ValidationFilter(BannerSaml11ValidationFilter){
@@ -110,7 +119,7 @@ Brief summary/description of the plugin.
         singleSignOutFilterRegistrationBean(FilterRegistrationBean) {
             name = 'CAS Single Sign Out Filter'
             filter = ref('singleSignOutFilter')
-            order = Ordered.HIGHEST_PRECEDENCE
+            order = Ordered.HIGHEST_PRECEDENCE + 20
         }
         singleSignOutHttpSessionListener(ServletListenerRegistrationBean, new SingleSignOutHttpSessionListener())
 
