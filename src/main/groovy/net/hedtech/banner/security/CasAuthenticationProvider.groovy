@@ -94,6 +94,7 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
             log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to CredentialsExpiredException: ${ce.message}"
             throw ce
         } catch (LockedException le)             {
+            log.debug "CasAuthenticationProvider was not able to authenticate user $authentication.name caused by: " + le.toString()
             log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to LockedException: ${le.message}"
             throw le
         } catch(AuthorizationException ae) {
