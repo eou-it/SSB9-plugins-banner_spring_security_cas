@@ -1,5 +1,5 @@
 /*******************************************************************************
- Copyright 2009-2019 Ellucian Company L.P. and its affiliates.
+ Copyright 2009-2020 Ellucian Company L.P. and its affiliates.
  *******************************************************************************/
 package net.hedtech.banner.security
 
@@ -44,14 +44,13 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
     }
 
     public Authentication authenticate( Authentication authentication ) {
-
         def conn
+        def sessionObj = RCH.currentRequestAttributes().request.session
         try {
             conn = dataSource.unproxiedConnection
             Sql db = new Sql( conn )
 
             log.trace "CasAuthenticationProvider.casAuthentication doing CAS authentication"
-            def sessionObj = RCH.currentRequestAttributes().request.session
             sessionObj.setAttribute("auth_name", sessionObj.getAttribute( AbstractCasFilter.CONST_CAS_ASSERTION ).principal.name)
             def attributeMap = sessionObj.getAttribute( AbstractCasFilter.CONST_CAS_ASSERTION ).principal.attributes
             def assertAttributeValue = attributeMap[CH?.config?.banner.sso.authenticationAssertionAttribute]
@@ -93,8 +92,9 @@ public class CasAuthenticationProvider implements AuthenticationProvider {
         } catch (CredentialsExpiredException ce) {
             log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to CredentialsExpiredException: ${ce.message}"
             throw ce
-        } catch (LockedException le)             {
-            log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to LockedException: ${le.message}"
+        } catch (LockedException le){
+            String casUser =  sessionObj.getAttribute('auth_name')
+            log.error "CasAuthenticationProvider was not able to authenticate user= $casUser , due to LockedException:" + le.toString()
             throw le
         } catch(AuthorizationException ae) {
             log.error "CasAuthenticationProvider was not able to authenticate user $authentication.name, due to AuthorizationException: ${ae.message}"
