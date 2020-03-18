@@ -102,7 +102,7 @@ dependencies {
         exclude module: "xmlunit"
     }
 
-    compile("org.opensaml:opensaml:2.5.3") {
+    compile("org.opensaml:opensaml:2.6.6") {
         exclude module: 'commons-codec'
         exclude module: 'commons-collections'
         exclude module: 'commons-lang'
