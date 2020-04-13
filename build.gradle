@@ -65,8 +65,8 @@ dependencies {
     //Added for Hibernate dependency
     compile "org.grails.plugins:hibernate5"
 
-    compile "org.hibernate:hibernate-core:5.1.5.Final"
-    compile "org.hibernate:hibernate-ehcache:5.1.5.Final"
+    compile "org.hibernate:hibernate-core:5.1.17.Final"
+    compile "org.hibernate:hibernate-ehcache:5.1.17.Final"
 
     //Added for BannerXE Spring security CAS Plugin dependency
     compile("org.grails.plugins:spring-security-cas:3.1.0") {
