@@ -35,7 +35,7 @@ class BannerSpringSecurityCasGrailsPlugin extends Plugin {
     ]
 
     List loadAfter = ['bannerCore','bannerGeneralUtility','springSecurityCas']
-    def grailsVersion = "3.3.2 > *"
+    def grailsVersion = "3.3.11 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
         "grails-app/views/error.gsp"
