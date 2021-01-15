@@ -171,6 +171,7 @@ dependencies {
         exclude module: "log4j"
         exclude module: "servlet-api"
         exclude module: "xom"
+        exclude module: "batik-css"
     }
 
     compile("org.apache.velocity:velocity:1.7") {
@@ -188,6 +189,7 @@ dependencies {
         exclude module: 'werken-xpath'
     }
 
+    compile('org.apache.xmlgraphics:batik-css:1.13')
     compile "xml-apis:xml-apis:1.4.01"
     compile ('commons-fileupload:commons-fileupload:1.3.2')
 
